@@ -1,0 +1,125 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Management API-Part 1
+  version: 1.0.0
+  description: 旅游文档管理-添加、查看、更新、删除旅游文档，删除旅游同伴
+servers:
+  - url: 'http://192.168.2.201:8083/travel-plans/management'
+paths:
+  '/{planId}/companions/{companionId}':
+    delete:
+      summary: 删除旅游同伴
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: companionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 同伴删除成功
+        '400':
+          description: 无效的计划ID或同伴ID
+  '/{planId}/documents':
+    post:
+      summary: 添加旅游文档
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentName:
+                  type: string
+                documentType:
+                  type: string
+                documentUrl:
+                  type: string
+                description:
+                  type: string
+                fileSize:
+                  type: integer
+      responses:
+        '201':
+          description: 文档添加成功
+        '400':
+          description: 参数错误
+    get:
+      summary: 获取旅游文档列表
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取文档列表
+        '400':
+          description: 无效的计划ID
+  '/{planId}/documents/{documentId}':
+    post:
+      summary: 更新旅游文档
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentName:
+                  type: string
+                documentType:
+                  type: string
+                documentUrl:
+                  type: string
+                description:
+                  type: string
+                fileSize:
+                  type: integer
+      responses:
+        '200':
+          description: 文档更新成功
+        '400':
+          description: 无效的计划ID或文档ID
+    delete:
+      summary: 删除旅游文档
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 文档删除成功
+        '400':
+          description: 无效的计划ID或文档ID

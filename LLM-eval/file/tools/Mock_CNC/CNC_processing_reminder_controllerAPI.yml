@@ -1,0 +1,347 @@
+openapi: 3.0.3
+info:
+  title: CNC加工提醒控制器API
+  description: CNC加工提醒信息管理相关接口
+  version: 1.0.0
+  contact:
+    name: CNC加工提醒API
+servers:
+  - url: http://192.168.2.201:8083
+    description: 开发环境服务器
+tags:
+  - name: 提醒管理
+    description: 提醒信息管理相关操作
+paths:
+  /cnc/process/reminders:
+    post:
+      tags:
+        - 提醒管理
+      summary: 上传提醒信息
+      description: 上传加工提醒信息
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                machineId:
+                  type: string
+                  description: 设备ID
+                  example: "MACHINE-001"
+                reminderTitle:
+                  type: string
+                  description: 提醒标题
+                  example: "定期保养提醒"
+                reminderTime:
+                  type: string
+                  description: 提醒时间
+                  example: "2025-09-24T09:00:00Z"
+                reminderType:
+                  type: string
+                  description: 提醒类型
+                  example: "维护"
+                description:
+                  type: string
+                  description: 提醒描述
+                  example: "主轴轴承需要定期润滑和检查"
+                createdBy:
+                  type: string
+                  description: 创建人
+                  example: "系统管理员"
+              required:
+                - machineId
+                - reminderTitle
+                - reminderTime
+                - reminderType
+                - description
+                - createdBy
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  reminderId:
+                    type: integer
+                    example: 1695476400000
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  reminderTitle:
+                    type: string
+                    example: "定期保养提醒"
+                  reminderTime:
+                    type: string
+                    example: "2025-09-24T09:00:00Z"
+                  reminderType:
+                    type: string
+                    example: "维护"
+                  description:
+                    type: string
+                    example: "主轴轴承需要定期润滑和检查"
+                  isCompleted:
+                    type: boolean
+                    example: false
+                  createdBy:
+                    type: string
+                    example: "系统管理员"
+                  createdAt:
+                    type: string
+                    format: date-time
+  /cnc/process/reminders/{reminderId}:
+    get:
+      tags:
+        - 提醒管理
+      summary: 查询提醒信息
+      description: 根据提醒ID查询提醒详情
+      parameters:
+        - name: reminderId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 提醒ID
+          example: 1695476400000
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  reminderId:
+                    type: integer
+                    example: 1695476400000
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  reminderTitle:
+                    type: string
+                    example: "定期保养提醒"
+                  reminderTime:
+                    type: string
+                    example: "2025-09-24T09:00:00Z"
+                  reminderType:
+                    type: string
+                    example: "维护"
+                  description:
+                    type: string
+                    example: "主轴轴承需要定期润滑和检查"
+                  isCompleted:
+                    type: boolean
+                    example: false
+                  createdBy:
+                    type: string
+                    example: "系统管理员"
+                  createdAt:
+                    type: string
+                    example: "2025-09-23T10:00:00Z"
+        '400':
+          description: 无效的提醒ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的提醒ID"
+  /cnc/process/reminders/{reminderId}/update:
+    post:
+      tags:
+        - 提醒管理
+      summary: 更新提醒信息
+      description: 更新提醒信息内容
+      parameters:
+        - name: reminderId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 提醒ID
+          example: 1695476400000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reminderTitle:
+                  type: string
+                  description: 提醒标题
+                  example: "定期保养提醒"
+                reminderTime:
+                  type: string
+                  description: 提醒时间
+                  example: "2025-09-24T09:00:00Z"
+                reminderType:
+                  type: string
+                  description: 提醒类型
+                  example: "维护"
+                description:
+                  type: string
+                  description: 提醒描述
+                  example: "主轴轴承需要定期润滑和检查"
+                isCompleted:
+                  type: boolean
+                  description: 是否完成
+                  example: false
+              required:
+                - reminderTitle
+                - reminderTime
+                - reminderType
+                - description
+                - isCompleted
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  reminderId:
+                    type: integer
+                    example: 1695476400000
+                  reminderTitle:
+                    type: string
+                    example: "定期保养提醒"
+                  reminderTime:
+                    type: string
+                    example: "2025-09-24T09:00:00Z"
+                  reminderType:
+                    type: string
+                    example: "维护"
+                  description:
+                    type: string
+                    example: "主轴轴承需要定期润滑和检查"
+                  isCompleted:
+                    type: boolean
+                    example: false
+                  updatedAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: 无效的提醒ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的提醒ID"
+  /cnc/process/reminders/{reminderId}/complete:
+    post:
+      tags:
+        - 提醒管理
+      summary: 标记提醒已完成
+      description: 标记提醒任务为已完成状态
+      parameters:
+        - name: reminderId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 提醒ID
+          example: 1695476400000
+      responses:
+        '200':
+          description: 标记成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  reminderId:
+                    type: integer
+                    example: 1695476400000
+                  isCompleted:
+                    type: boolean
+                    example: true
+                  completedAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: 无效的提醒ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的提醒ID"
+  /cnc/process/reminders/{reminderId}/status:
+    get:
+      tags:
+        - 提醒管理
+      summary: 查询提醒完成状态
+      description: 查询提醒任务的完成状态
+      parameters:
+        - name: reminderId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 提醒ID
+          example: 1695476400000
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  reminderId:
+                    type: integer
+                    example: 1695476400000
+                  isCompleted:
+                    type: boolean
+                    example: false
+                  status:
+                    type: string
+                    example: "待处理"
+        '400':
+          description: 无效的提醒ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的提醒ID"

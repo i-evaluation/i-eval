@@ -1,0 +1,791 @@
+openapi: 3.0.3
+info:
+  title: CNC操作员管理控制器API
+  description: CNC操作员信息管理和绩效分析相关接口
+  version: 1.0.0
+  contact:
+    name: CNC操作员管理API
+servers:
+  - url: http://192.168.2.201:8083
+    description: 开发环境服务器
+tags:
+  - name: 操作员管理
+    description: 操作员信息管理相关操作
+  - name: 任务管理
+    description: 操作员任务管理相关操作
+  - name: 绩效分析
+    description: 操作员绩效分析相关操作
+  - name: 培训管理
+    description: 操作员培训管理相关操作
+paths:
+  /cnc/process/operators:
+    post:
+      tags:
+        - 操作员管理
+      summary: 上传操作员信息
+      description: 上传操作员基本信息
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 操作员姓名
+                  example: "张工"
+                employeeId:
+                  type: string
+                  description: 员工编号
+                  example: "EMP001"
+                department:
+                  type: string
+                  description: 部门
+                  example: "生产部"
+                position:
+                  type: string
+                  description: 职位
+                  example: "高级操作员"
+                skills:
+                  type: array
+                  items:
+                    type: string
+                  description: 技能列表
+                  example: ["CNC编程", "设备操作", "质量检测"]
+                certifications:
+                  type: array
+                  items:
+                    type: string
+                  description: 证书列表
+                  example: ["CNC操作证书", "安全培训证书"]
+                contact:
+                  type: object
+                  properties:
+                    phone:
+                      type: string
+                      example: "13800138000"
+                    email:
+                      type: string
+                      example: "zhanggong@example.com"
+                  description: 联系方式
+              required:
+                - name
+                - employeeId
+                - department
+                - position
+                - skills
+                - certifications
+                - contact
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operatorId:
+                    type: integer
+                    example: 1695476400000
+                  name:
+                    type: string
+                    example: "张工"
+                  employeeId:
+                    type: string
+                    example: "EMP001"
+                  department:
+                    type: string
+                    example: "生产部"
+                  position:
+                    type: string
+                    example: "高级操作员"
+                  skills:
+                    type: array
+                    items:
+                      type: string
+                    example: ["CNC编程", "设备操作", "质量检测"]
+                  certifications:
+                    type: array
+                    items:
+                      type: string
+                    example: ["CNC操作证书", "安全培训证书"]
+                  contact:
+                    type: object
+                    properties:
+                      phone:
+                        type: string
+                        example: "13800138000"
+                      email:
+                        type: string
+                        example: "zhanggong@example.com"
+                  status:
+                    type: string
+                    example: "在职"
+                  createdAt:
+                    type: string
+                    format: date-time
+    get:
+      tags:
+        - 操作员管理
+      summary: 查询所有操作员
+      description: 获取所有操作员列表
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operators:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        operatorId:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: "张工"
+                        employeeId:
+                          type: string
+                          example: "EMP001"
+                        position:
+                          type: string
+                          example: "高级操作员"
+                        status:
+                          type: string
+                          example: "在职"
+  /cnc/process/operators/{operatorId}:
+    get:
+      tags:
+        - 操作员管理
+      summary: 查询操作员信息
+      description: 根据操作员ID查询详细信息
+      parameters:
+        - name: operatorId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 操作员ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operatorId:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: "张工"
+                  employeeId:
+                    type: string
+                    example: "EMP001"
+                  department:
+                    type: string
+                    example: "生产部"
+                  position:
+                    type: string
+                    example: "高级操作员"
+                  skills:
+                    type: array
+                    items:
+                      type: string
+                    example: ["CNC编程", "设备操作", "质量检测"]
+                  certifications:
+                    type: array
+                    items:
+                      type: string
+                    example: ["CNC操作证书", "安全培训证书"]
+                  contact:
+                    type: object
+                    properties:
+                      phone:
+                        type: string
+                        example: "13800138000"
+                      email:
+                        type: string
+                        example: "zhanggong@example.com"
+                  status:
+                    type: string
+                    example: "在职"
+                  joinDate:
+                    type: string
+                    example: "2020-05-15"
+        '400':
+          description: 无效的操作员ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的操作员ID"
+  /cnc/process/operators/{operatorId}/tasks:
+    get:
+      tags:
+        - 任务管理
+      summary: 查询操作员任务记录
+      description: 查询操作员的任务执行记录
+      parameters:
+        - name: operatorId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 操作员ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operatorId:
+                    type: integer
+                    example: 1
+                  dateRange:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        example: "2025-09-23T00:00:00Z"
+                      end:
+                        type: string
+                        example: "2025-09-23T23:59:59Z"
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        taskId:
+                          type: integer
+                          example: 1
+                        machineId:
+                          type: string
+                          example: "MACHINE-001"
+                        taskName:
+                          type: string
+                          example: "零件A生产"
+                        timeSlot:
+                          type: string
+                          example: "08:00-12:00"
+                        status:
+                          type: string
+                          example: "完成"
+                        progress:
+                          type: integer
+                          example: 100
+        '400':
+          description: 无效的操作员ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的操作员ID"
+  /cnc/process/operators/{operatorId}/logs:
+    get:
+      tags:
+        - 操作员管理
+      summary: 查询操作员操作日志
+      description: 查询操作员的操作日志记录
+      parameters:
+        - name: operatorId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 操作员ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operatorId:
+                    type: integer
+                    example: 1
+                  dateRange:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        example: "2025-09-23T00:00:00Z"
+                      end:
+                        type: string
+                        example: "2025-09-23T23:59:59Z"
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          example: "2025-09-23T08:00:00Z"
+                        action:
+                          type: string
+                          example: "登录系统"
+                        machineId:
+                          type: string
+                          example: "MACHINE-001"
+        '400':
+          description: 无效的操作员ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的操作员ID"
+  /cnc/process/operators/{operatorId}/performance:
+    get:
+      tags:
+        - 绩效分析
+      summary: 查询操作员绩效数据
+      description: 查询操作员绩效统计数据分析
+      parameters:
+        - name: operatorId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 操作员ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operatorId:
+                    type: integer
+                    example: 1
+                  dateRange:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        example: "2025-09-23T00:00:00Z"
+                      end:
+                        type: string
+                        example: "2025-09-23T23:59:59Z"
+                  performance:
+                    type: object
+                    properties:
+                      totalTasks:
+                        type: integer
+                        example: 45
+                      completedTasks:
+                        type: integer
+                        example: 43
+                      completionRate:
+                        type: number
+                        example: 0.96
+                      averageEfficiency:
+                        type: number
+                        example: 0.92
+                      totalWorkpieces:
+                        type: integer
+                        example: 2150
+                      defectRate:
+                        type: number
+                        example: 0.015
+                      totalOperatingTime:
+                        type: number
+                        example: 180.5
+        '400':
+          description: 无效的操作员ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的操作员ID"
+  /cnc/process/operators/{operatorId}/alerts:
+    post:
+      tags:
+        - 操作员管理
+      summary: 上传操作员告警信息
+      description: 上传操作员相关的告警信息
+      parameters:
+        - name: operatorId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 操作员ID
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                alertType:
+                  type: string
+                  description: 告警类型
+                  example: "操作错误"
+                severity:
+                  type: string
+                  description: 严重程度
+                  example: "高"
+                message:
+                  type: string
+                  description: 告警信息
+                  example: "未按规程操作设备"
+                machineId:
+                  type: string
+                  description: 相关设备ID
+                  example: "MACHINE-001"
+              required:
+                - alertType
+                - severity
+                - message
+                - machineId
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operatorId:
+                    type: integer
+                    example: 1
+                  alertId:
+                    type: integer
+                    example: 1695476400000
+                  alertType:
+                    type: string
+                    example: "操作错误"
+                  severity:
+                    type: string
+                    example: "高"
+                  message:
+                    type: string
+                    example: "未按规程操作设备"
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: "未处理"
+        '400':
+          description: 无效的操作员ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的操作员ID"
+    get:
+      tags:
+        - 操作员管理
+      summary: 查询操作员告警信息
+      description: 查询操作员相关的告警信息列表
+      parameters:
+        - name: operatorId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 操作员ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operatorId:
+                    type: integer
+                    example: 1
+                  alerts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        alertId:
+                          type: integer
+                          example: 1
+                        alertType:
+                          type: string
+                          example: "操作错误"
+                        severity:
+                          type: string
+                          example: "高"
+                        message:
+                          type: string
+                          example: "未按规程操作设备"
+                        machineId:
+                          type: string
+                          example: "MACHINE-001"
+                        timestamp:
+                          type: string
+                          example: "2025-09-23T10:30:00Z"
+                        status:
+                          type: string
+                          example: "未处理"
+        '400':
+          description: 无效的操作员ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的操作员ID"
+  /cnc/process/operators/{operatorId}/training:
+    post:
+      tags:
+        - 培训管理
+      summary: 上传培训记录
+      description: 上传操作员培训记录
+      parameters:
+        - name: operatorId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 操作员ID
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trainingName:
+                  type: string
+                  description: 培训名称
+                  example: "CNC高级操作培训"
+                trainingType:
+                  type: string
+                  description: 培训类型
+                  example: "技能提升"
+                trainingDate:
+                  type: string
+                  description: 培训日期
+                  example: "2025-08-15"
+                duration:
+                  type: integer
+                  description: 培训时长(小时)
+                  example: 8
+                instructor:
+                  type: string
+                  description: 培训讲师
+                  example: "王教练"
+                result:
+                  type: string
+                  description: 培训结果
+                  example: "优秀"
+                certificate:
+                  type: string
+                  description: 证书编号
+                  example: "CERT-001"
+              required:
+                - trainingName
+                - trainingType
+                - trainingDate
+                - duration
+                - instructor
+                - result
+                - certificate
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operatorId:
+                    type: integer
+                    example: 1
+                  trainingId:
+                    type: integer
+                    example: 1695476400000
+                  trainingName:
+                    type: string
+                    example: "CNC高级操作培训"
+                  trainingType:
+                    type: string
+                    example: "技能提升"
+                  trainingDate:
+                    type: string
+                    example: "2025-08-15"
+                  duration:
+                    type: integer
+                    example: 8
+                  instructor:
+                    type: string
+                    example: "王教练"
+                  result:
+                    type: string
+                    example: "优秀"
+                  certificate:
+                    type: string
+                    example: "CERT-001"
+                  createdAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: 无效的操作员ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的操作员ID"
+    get:
+      tags:
+        - 培训管理
+      summary: 查询培训记录
+      description: 查询操作员培训记录列表
+      parameters:
+        - name: operatorId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 操作员ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operatorId:
+                    type: integer
+                    example: 1
+                  trainings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        trainingId:
+                          type: integer
+                          example: 1
+                        trainingName:
+                          type: string
+                          example: "CNC高级操作培训"
+                        trainingType:
+                          type: string
+                          example: "技能提升"
+                        trainingDate:
+                          type: string
+                          example: "2025-08-15"
+                        duration:
+                          type: integer
+                          example: 8
+                        instructor:
+                          type: string
+                          example: "王教练"
+                        result:
+                          type: string
+                          example: "优秀"
+                        certificate:
+                          type: string
+                          example: "CERT-001"
+        '400':
+          description: 无效的操作员ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的操作员ID"

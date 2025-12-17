@@ -1,0 +1,110 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Final API-Part 2
+  version: 1.0.0
+  description: 社交和分享，涵盖分享旅游计划，查看旅游计划评论，点赞旅游计划
+servers:
+  - url: 'http://192.168.201:8083/travel-plans-final'
+paths:
+  '/{planId}/share':
+    post:
+      summary: 分享旅游计划
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                shareMethod:
+                  type: string
+                  example: 微信
+      responses:
+        '200':
+          description: 成功分享计划
+        '400':
+          description: 参数错误
+  '/{planId}/share/statistics':
+    get:
+      summary: 获取分享统计
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取统计数据
+        '400':
+          description: 无效计划ID
+  '/{planId}/comments':
+    post:
+      summary: 添加评论
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: 很棒的计划！
+                author:
+                  type: string
+                  example: 用户A
+      responses:
+        '201':
+          description: 评论添加成功
+        '400':
+          description: 参数错误
+    get:
+      summary: 获取评论列表
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取评论列表
+        '400':
+          description: 无效计划ID
+  '/{planId}/like':
+    post:
+      summary: 点赞旅游计划
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  example: user123
+      responses:
+        '200':
+          description: 点赞成功
+        '400':
+          description: 参数错误

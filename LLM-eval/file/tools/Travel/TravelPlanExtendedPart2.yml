@@ -1,0 +1,131 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Extended API - Part 2
+  version: 1.0.0
+  description: 路线规划,涉及共享单车、步行、航班、火车、长途汽车
+servers:
+  - url: 'http://192.168.2.201:8083/travel-plans-extended'
+paths:
+  '/{planId}/transport/bike-sharing':
+    get:
+      summary: 获取共享单车信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: location
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 共享单车站点信息
+  '/{planId}/transport/walking':
+    get:
+      summary: 获取步行路线
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 步行路线信息
+  '/{planId}/transport/flights':
+    get:
+      summary: 获取航班信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 航班信息
+  '/{planId}/transport/trains':
+    get:
+      summary: 获取火车信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 火车信息
+  '/{planId}/transport/bus':
+    get:
+      summary: 获取长途汽车信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 长途汽车信息

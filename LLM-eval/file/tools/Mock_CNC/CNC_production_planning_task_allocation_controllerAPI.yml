@@ -1,0 +1,694 @@
+openapi: 3.0.3
+info:
+  title: CNC生产计划与任务分配控制器API
+  description: CNC生产计划管理和任务分配相关接口
+  version: 1.0.0
+  contact:
+    name: CNC生产计划与任务分配API
+servers:
+  - url: http://192.168.2.201:8083
+    description: 开发环境服务器
+tags:
+  - name: 生产计划
+    description: 生产计划管理相关操作
+  - name: 任务分配
+    description: 任务分配管理相关操作
+paths:
+  /cnc/process/schedules:
+    post:
+      tags:
+        - 生产计划
+      summary: 上传生产计划
+      description: 上传生产计划信息
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planName:
+                  type: string
+                  description: 计划名称
+                  example: "九月生产计划"
+                startDate:
+                  type: string
+                  description: 开始日期
+                  example: "2025-09-01T00:00:00Z"
+                endDate:
+                  type: string
+                  description: 结束日期
+                  example: "2025-09-30T23:59:59Z"
+                product:
+                  type: string
+                  description: 产品名称
+                  example: "零件A"
+                quantity:
+                  type: integer
+                  description: 生产数量
+                  example: 5000
+                machines:
+                  type: array
+                  items:
+                    type: string
+                  description: 使用设备列表
+                  example: ["MACHINE-001", "MACHINE-002"]
+                createdBy:
+                  type: string
+                  description: 创建人
+                  example: "生产主管"
+              required:
+                - planName
+                - startDate
+                - endDate
+                - product
+                - quantity
+                - machines
+                - createdBy
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  scheduleId:
+                    type: integer
+                    example: 1695476400000
+                  planName:
+                    type: string
+                    example: "九月生产计划"
+                  startDate:
+                    type: string
+                    example: "2025-09-01T00:00:00Z"
+                  endDate:
+                    type: string
+                    example: "2025-09-30T23:59:59Z"
+                  product:
+                    type: string
+                    example: "零件A"
+                  quantity:
+                    type: integer
+                    example: 5000
+                  machines:
+                    type: array
+                    items:
+                      type: string
+                    example: ["MACHINE-001", "MACHINE-002"]
+                  status:
+                    type: string
+                    example: "计划中"
+                  createdBy:
+                    type: string
+                    example: "生产主管"
+                  createdAt:
+                    type: string
+                    format: date-time
+  /cnc/process/schedules/{scheduleId}:
+    get:
+      tags:
+        - 生产计划
+      summary: 查询生产计划
+      description: 根据计划ID查询生产计划详情
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 计划ID
+          example: 1695476400000
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  scheduleId:
+                    type: integer
+                    example: 1695476400000
+                  planName:
+                    type: string
+                    example: "九月生产计划"
+                  startDate:
+                    type: string
+                    example: "2025-09-01T00:00:00Z"
+                  endDate:
+                    type: string
+                    example: "2025-09-30T23:59:59Z"
+                  product:
+                    type: string
+                    example: "零件A"
+                  quantity:
+                    type: integer
+                    example: 5000
+                  machines:
+                    type: array
+                    items:
+                      type: string
+                    example: ["MACHINE-001", "MACHINE-002"]
+                  status:
+                    type: string
+                    example: "进行中"
+                  createdBy:
+                    type: string
+                    example: "生产主管"
+                  createdAt:
+                    type: string
+                    example: "2025-08-25T10:00:00Z"
+        '400':
+          description: 无效的计划ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的计划ID"
+  /cnc/process/schedules/date/{date}:
+    get:
+      tags:
+        - 生产计划
+      summary: 查询指定日期生产计划
+      description: 查询指定日期的生产计划
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 日期
+          example: "2025-09-23"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  date:
+                    type: string
+                    example: "2025-09-23"
+                  schedules:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scheduleId:
+                          type: integer
+                          example: 1
+                        planName:
+                          type: string
+                          example: "零件A生产"
+                        startTime:
+                          type: string
+                          example: "2025-09-23T08:00:00Z"
+                        endTime:
+                          type: string
+                          example: "2025-09-23T17:00:00Z"
+                        machineId:
+                          type: string
+                          example: "MACHINE-001"
+                        status:
+                          type: string
+                          example: "进行中"
+        '400':
+          description: 无效的日期
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的日期"
+  /cnc/process/schedules/tasks:
+    post:
+      tags:
+        - 任务分配
+      summary: 上传任务分配
+      description: 上传任务分配信息
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scheduleId:
+                  type: string
+                  description: 计划ID
+                  example: "SCHEDULE-001"
+                machineId:
+                  type: string
+                  description: 设备ID
+                  example: "MACHINE-001"
+                operator:
+                  type: string
+                  description: 操作员
+                  example: "张工"
+                workpieceId:
+                  type: string
+                  description: 工件ID
+                  example: "WORKPIECE-001"
+                quantity:
+                  type: integer
+                  description: 数量
+                  example: 100
+                startTime:
+                  type: string
+                  description: 开始时间
+                  example: "2025-09-23T08:00:00Z"
+                endTime:
+                  type: string
+                  description: 结束时间
+                  example: "2025-09-23T12:00:00Z"
+                assignedBy:
+                  type: string
+                  description: 分配人
+                  example: "生产主管"
+              required:
+                - scheduleId
+                - machineId
+                - operator
+                - workpieceId
+                - quantity
+                - startTime
+                - endTime
+                - assignedBy
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  taskId:
+                    type: integer
+                    example: 1695476400000
+                  scheduleId:
+                    type: string
+                    example: "SCHEDULE-001"
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  operator:
+                    type: string
+                    example: "张工"
+                  workpieceId:
+                    type: string
+                    example: "WORKPIECE-001"
+                  quantity:
+                    type: integer
+                    example: 100
+                  startTime:
+                    type: string
+                    example: "2025-09-23T08:00:00Z"
+                  endTime:
+                    type: string
+                    example: "2025-09-23T12:00:00Z"
+                  status:
+                    type: string
+                    example: "待开始"
+                  assignedBy:
+                    type: string
+                    example: "生产主管"
+                  assignedAt:
+                    type: string
+                    format: date-time
+  /cnc/process/schedules/tasks/{taskId}:
+    get:
+      tags:
+        - 任务分配
+      summary: 查询任务分配记录
+      description: 根据任务ID查询任务分配详情
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 任务ID
+          example: 1695476400000
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  taskId:
+                    type: integer
+                    example: 1695476400000
+                  scheduleId:
+                    type: string
+                    example: "SCHEDULE-001"
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  operator:
+                    type: string
+                    example: "张工"
+                  workpieceId:
+                    type: string
+                    example: "WORKPIECE-001"
+                  quantity:
+                    type: integer
+                    example: 100
+                  startTime:
+                    type: string
+                    example: "2025-09-23T08:00:00Z"
+                  endTime:
+                    type: string
+                    example: "2025-09-23T12:00:00Z"
+                  status:
+                    type: string
+                    example: "进行中"
+                  assignedBy:
+                    type: string
+                    example: "生产主管"
+                  assignedAt:
+                    type: string
+                    example: "2025-09-23T07:30:00Z"
+        '400':
+          description: 无效的任务ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的任务ID"
+  /cnc/process/schedules/tasks/{taskId}/complete:
+    post:
+      tags:
+        - 任务分配
+      summary: 上传任务完成状态
+      description: 上传任务完成状态信息
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 任务ID
+          example: 1695476400000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: 任务状态
+                  example: "完成"
+                completedQuantity:
+                  type: integer
+                  description: 完成数量
+                  example: 98
+                defectQuantity:
+                  type: integer
+                  description: 缺陷数量
+                  example: 2
+                actualEndTime:
+                  type: string
+                  description: 实际结束时间
+                  example: "2025-09-23T11:45:00Z"
+                notes:
+                  type: string
+                  description: 备注
+                  example: "任务执行顺利"
+              required:
+                - status
+                - completedQuantity
+                - defectQuantity
+                - actualEndTime
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  taskId:
+                    type: integer
+                    example: 1695476400000
+                  status:
+                    type: string
+                    example: "完成"
+                  completedQuantity:
+                    type: integer
+                    example: 98
+                  defectQuantity:
+                    type: integer
+                    example: 2
+                  actualEndTime:
+                    type: string
+                    example: "2025-09-23T11:45:00Z"
+                  notes:
+                    type: string
+                    example: "任务执行顺利"
+                  updatedAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: 无效的任务ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的任务ID"
+  /cnc/process/schedules/tasks/{taskId}/status:
+    get:
+      tags:
+        - 任务分配
+      summary: 查询任务完成状态
+      description: 查询任务当前完成状态
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 任务ID
+          example: 1695476400000
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  taskId:
+                    type: integer
+                    example: 1695476400000
+                  status:
+                    type: string
+                    example: "进行中"
+                  progress:
+                    type: number
+                    example: 0.65
+                  completedQuantity:
+                    type: integer
+                    example: 65
+                  defectQuantity:
+                    type: integer
+                    example: 2
+                  estimatedCompletionTime:
+                    type: string
+                    example: "2025-09-23T11:30:00Z"
+        '400':
+          description: 无效的任务ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的任务ID"
+  /cnc/process/schedules/tasks/machine/{machineId}:
+    get:
+      tags:
+        - 任务分配
+      summary: 查询设备任务
+      description: 查询指定设备的任务列表
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  date:
+                    type: string
+                    example: "2025-09-23"
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        taskId:
+                          type: integer
+                          example: 1
+                        taskName:
+                          type: string
+                          example: "零件A生产"
+                        operator:
+                          type: string
+                          example: "张工"
+                        timeSlot:
+                          type: string
+                          example: "08:00-12:00"
+                        status:
+                          type: string
+                          example: "进行中"
+                        progress:
+                          type: integer
+                          example: 65
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+  /cnc/process/schedules/tasks/operator/{operator}:
+    get:
+      tags:
+        - 任务分配
+      summary: 查询操作员任务
+      description: 查询指定操作员的任务列表
+      parameters:
+        - name: operator
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 操作员
+          example: "张工"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  operator:
+                    type: string
+                    example: "张工"
+                  date:
+                    type: string
+                    example: "2025-09-23"
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        taskId:
+                          type: integer
+                          example: 1
+                        machineId:
+                          type: string
+                          example: "MACHINE-001"
+                        taskName:
+                          type: string
+                          example: "零件A生产"
+                        timeSlot:
+                          type: string
+                          example: "08:00-12:00"
+                        status:
+                          type: string
+                          example: "进行中"
+                        progress:
+                          type: integer
+                          example: 65
+        '400':
+          description: 无效的操作员
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的操作员"

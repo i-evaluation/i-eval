@@ -1,0 +1,125 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Extended API - Part 4
+  version: 1.0.0
+  description: 交通和导航功能，涉及实时状态、历史数据、优化、费用对比、综合报告
+servers:
+  - url: 'http://192.168.2.201:8083/travel-plans-extended'
+paths:
+  '/travel-plans-extended/{planId}/transport/real-time-status':
+    get:
+      summary: 获取交通实时状态
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: route
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 实时交通状态
+  '/travel-plans-extended/{planId}/transport/history':
+    get:
+      summary: 获取交通历史数据
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: route
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 交通历史数据
+  '/travel-plans-extended/{planId}/transport/optimization':
+    get:
+      summary: 获取交通优化建议
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: preferredTime
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 交通优化建议
+  '/travel-plans-extended/{planId}/transport/cost-comparison':
+    get:
+      summary: 获取交通费用对比
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 交通费用对比
+  '/travel-plans-extended/{planId}/transport/comprehensive-report':
+    get:
+      summary: 获取交通综合报告
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 交通综合报告

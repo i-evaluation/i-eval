@@ -1,0 +1,319 @@
+openapi: 3.0.0
+info:
+  title: 空调设备性能监控接口
+  description: 获取空调设备运行时的详细性能参数和监控数据
+  version: 1.0.0
+servers:
+  - url: http://192.168.2.201:8083
+paths:
+  /api/air-conditioner/performance:
+    post:
+      summary: 获取空调设备性能参数
+      description: 获取空调设备运行时的详细性能参数
+      operationId: getAirConditionerPerformance
+      tags:
+        - 空调设备管理
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deviceId
+              properties:
+                deviceId:
+                  type: string
+                  description: 设备ID
+                  example: "AC001"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: 响应状态码
+                    example: 200
+                  deviceId:
+                    type: string
+                    description: 设备ID
+                    example: "AC001"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    description: 查询时间戳
+                    example: "2024-01-15T10:30:00Z"
+                  powerConsumption:
+                    type: integer
+                    description: 功耗 (W)
+                    example: 1250
+                  coolingCapacity:
+                    type: integer
+                    description: 制冷量 (W)
+                    example: 3750
+                  heatingCapacity:
+                    type: integer
+                    description: 制热量 (W)
+                    example: 4200
+                  energyEfficiencyRatio:
+                    type: number
+                    format: float
+                    description: 能效比
+                    example: 3.5
+                  noiseLevel:
+                    type: integer
+                    description: 噪音水平 (dB)
+                    example: 38
+                  airFlowRate:
+                    type: integer
+                    description: 风量 (m³/h)
+                    example: 450
+                  compressorFrequency:
+                    type: integer
+                    description: 压缩机频率 (Hz)
+                    example: 45
+                  fanSpeedRPM:
+                    type: integer
+                    description: 风扇转速 (RPM)
+                    example: 950
+                  evaporatorTemp:
+                    type: number
+                    format: float
+                    description: 蒸发器温度 (°C)
+                    example: 6.5
+                  condenserTemp:
+                    type: number
+                    format: float
+                    description: 冷凝器温度 (°C)
+                    example: 47.2
+                  refrigerantPressure:
+                    type: number
+                    format: float
+                    description: 制冷剂压力 (MPa)
+                    example: 2.8
+                  voltage:
+                    type: integer
+                    description: 电压 (V)
+                    example: 225
+                  current:
+                    type: number
+                    format: float
+                    description: 电流 (A)
+                    example: 6.2
+                  powerFactor:
+                    type: number
+                    format: float
+                    description: 功率因数
+                    example: 0.92
+                  outdoorTemp:
+                    type: integer
+                    description: 室外温度 (lengthMode=1时返回)
+                    example: 35
+                  indoorTemp:
+                    type: integer
+                    description: 室内温度 (lengthMode=1时返回)
+                    example: 27
+                  humidity:
+                    type: integer
+                    description: 湿度 (lengthMode=1时返回)
+                    example: 60
+                  airQualityIndex:
+                    type: integer
+                    description: 空气质量指数 (lengthMode=1时返回)
+                    example: 85
+                  co2Level:
+                    type: integer
+                    description: CO2浓度 (ppm) (lengthMode=1时返回)
+                    example: 450
+                  pm25Level:
+                    type: integer
+                    description: PM2.5浓度 (μg/m³) (lengthMode=1时返回)
+                    example: 35
+                  runningTime:
+                    type: integer
+                    description: 运行时间 (小时) (lengthMode=1时返回)
+                    example: 1280
+                  startupCount:
+                    type: integer
+                    description: 启动次数 (lengthMode=1时返回)
+                    example: 165
+                  errorCount:
+                    type: integer
+                    description: 错误次数 (lengthMode=1时返回)
+                    example: 2
+                  maintenanceCount:
+                    type: integer
+                    description: 维护次数 (lengthMode=1时返回)
+                    example: 4
+                  filterLife:
+                    type: integer
+                    description: 滤网寿命 (%) (lengthMode=1时返回)
+                    example: 88
+                  uvLampLife:
+                    type: integer
+                    description: UV灯寿命 (%) (lengthMode=1时返回)
+                    example: 75
+                  smartEyeStatus:
+                    type: boolean
+                    description: 智能眼状态 (lengthMode=1时返回)
+                    example: true
+                  autoCleanStatus:
+                    type: boolean
+                    description: 自清洁状态 (lengthMode=1时返回)
+                    example: false
+                  freshAirIntake:
+                    type: integer
+                    description: 新风量 (%) (lengthMode=1时返回)
+                    example: 65
+                  heatRecoveryEfficiency:
+                    type: integer
+                    description: 热回收效率 (%) (lengthMode=1时返回)
+                    example: 75
+                  wifiSignalStrength:
+                    type: integer
+                    description: WiFi信号强度 (%) (lengthMode=1时返回)
+                    example: 90
+                  firmwareVersion:
+                    type: string
+                    description: 固件版本 (lengthMode=1时返回)
+                    example: "1.2.3"
+                  lastUpdateTime:
+                    type: string
+                    description: 最后更新时间 (lengthMode=1时返回)
+                    example: "2024-01-15 10:30:00"
+                  avgDailyConsumption:
+                    type: number
+                    format: float
+                    description: 日均耗电量 (kWh) (lengthMode=1时返回)
+                    example: 9.2
+                  monthlyConsumption:
+                    type: integer
+                    description: 月耗电量 (kWh) (lengthMode=1时返回)
+                    example: 275
+                  efficiencyTrend:
+                    type: string
+                    description: 效率趋势 (lengthMode=1时返回)
+                    example: "stable"
+                  performanceScore:
+                    type: integer
+                    description: 性能评分 (lengthMode=1时返回)
+                    example: 88
+                  energySavingLevel:
+                    type: string
+                    description: 节能等级 (lengthMode=1时返回)
+                    example: "high"
+                  comfortLevel:
+                    type: integer
+                    description: 舒适度评分 (lengthMode=1时返回)
+                    example: 92
+                  predictedMaintenanceDate:
+                    type: string
+                    description: 预测维护日期 (lengthMode=1时返回)
+                    example: "2024-04-15"
+                  componentHealthScore:
+                    type: integer
+                    description: 组件健康评分 (lengthMode=1时返回)
+                    example: 90
+                  compressorHealth:
+                    type: integer
+                    description: 压缩机健康度 (lengthMode=1时返回)
+                    example: 92
+                  fanHealth:
+                    type: integer
+                    description: 风扇健康度 (lengthMode=1时返回)
+                    example: 88
+                  sensorHealth:
+                    type: integer
+                    description: 传感器健康度 (lengthMode=1时返回)
+                    example: 96
+                  totalEnergySaved:
+                    type: integer
+                    description: 总节能 (kWh) (lengthMode=1时返回)
+                    example: 1350
+                  co2Reduction:
+                    type: integer
+                    description: CO2减排 (kg) (lengthMode=1时返回)
+                    example: 675
+                  costSavings:
+                    type: integer
+                    description: 成本节约 (元) (lengthMode=1时返回)
+                    example: 810
+                  operationEfficiency:
+                    type: integer
+                    description: 运行效率 (%) (lengthMode=1时返回)
+                    example: 94
+                  usagePattern:
+                    type: string
+                    description: 使用模式 (lengthMode=1时返回)
+                    example: "regular"
+                  optimizationSuggestions:
+                    type: string
+                    description: 优化建议 (lengthMode=1时返回)
+                    example: "建议在夜间使用节能模式"
+                  peakUsageTime:
+                    type: string
+                    description: 高峰使用时间 (lengthMode=1时返回)
+                    example: "14:00-16:00"
+                  recommendedTemp:
+                    type: integer
+                    description: 推荐温度 (lengthMode=1时返回)
+                    example: 26
+                  energyOptimizationLevel:
+                    type: string
+                    description: 能耗优化等级 (lengthMode=1时返回)
+                    example: "medium"
+        '401':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: 错误状态码
+                    example: 401
+                  message:
+                    type: string
+                    description: 错误信息
+                    example: "请求参数异常：缺少必要参数deviceId"
+components:
+  schemas:
+    AirConditionerPerformanceRequest:
+      type: object
+      required:
+        - deviceId
+      properties:
+        deviceId:
+          type: string
+          description: 设备ID
+        lengthMode:
+          type: integer
+          description: 响应长度模式
+    AirConditionerPerformanceResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 响应状态码
+        deviceId:
+          type: string
+          description: 设备ID
+        timestamp:
+          type: string
+          format: date-time
+          description: 查询时间戳
+        powerConsumption:
+          type: integer
+          description: 功耗
+        coolingCapacity:
+          type: integer
+          description: 制冷量
+        energyEfficiencyRatio:
+          type: number
+          format: float
+          description: 能效比

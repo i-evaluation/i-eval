@@ -1,0 +1,774 @@
+openapi: 3.0.3
+info:
+  title: CNC加工监控控制器API
+  description: CNC设备运行状态监控和参数管理相关接口
+  version: 1.0.0
+  contact:
+    name: CNC加工监控API
+servers:
+  - url: http://192.168.2.201:8083
+    description: 开发环境服务器
+tags:
+  - name: 设备监控
+    description: 设备运行状态监控相关操作
+  - name: 参数管理
+    description: 设备运行参数管理相关操作
+  - name: 数据监控
+    description: 设备运行数据监控相关操作
+paths:
+  /cnc/process/monitor/machines/{machineId}/status:
+    get:
+      tags:
+        - 设备监控
+      summary: 查询设备运行状态
+      description: 查询指定设备的当前运行状态
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  status:
+                    type: string
+                    example: "运行中"
+                  mode:
+                    type: string
+                    example: "自动"
+                  currentProgram:
+                    type: string
+                    example: "PROGRAM-001"
+                  startTime:
+                    type: string
+                    example: "2025-09-23T08:00:00Z"
+                  runningTime:
+                    type: number
+                    example: 2.5
+                  estimatedCompletionTime:
+                    type: string
+                    example: "2025-09-23T12:00:00Z"
+                  progress:
+                    type: number
+                    example: 0.65
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+  /cnc/process/monitor/machines/{machineId}/parameters:
+    post:
+      tags:
+        - 参数管理
+      summary: 上传运行参数
+      description: 上传设备运行参数
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parameters:
+                  type: object
+                  description: 运行参数
+                  properties:
+                    spindleSpeed:
+                      type: integer
+                      example: 12000
+                    feedRate:
+                      type: integer
+                      example: 500
+                    cuttingDepth:
+                      type: number
+                      example: 2.5
+                    coolantFlow:
+                      type: number
+                      example: 5.0
+                    toolNumber:
+                      type: integer
+                      example: 3
+                uploadedBy:
+                  type: string
+                  description: 上传人
+                  example: "张工"
+              required:
+                - parameters
+                - uploadedBy
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  parameters:
+                    type: object
+                    properties:
+                      spindleSpeed:
+                        type: integer
+                        example: 12000
+                      feedRate:
+                        type: integer
+                        example: 500
+                      cuttingDepth:
+                        type: number
+                        example: 2.5
+                      coolantFlow:
+                        type: number
+                        example: 5.0
+                      toolNumber:
+                        type: integer
+                        example: 3
+                  uploadedBy:
+                    type: string
+                    example: "张工"
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+    get:
+      tags:
+        - 参数管理
+      summary: 查询运行参数
+      description: 查询设备当前运行参数
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+                  parameters:
+                    type: object
+                    properties:
+                      spindleSpeed:
+                        type: integer
+                        example: 12000
+                      feedRate:
+                        type: integer
+                        example: 500
+                      cuttingDepth:
+                        type: number
+                        example: 2.5
+                      coolantFlow:
+                        type: number
+                        example: 5.0
+                      toolNumber:
+                        type: integer
+                        example: 3
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+  /cnc/process/monitor/machines/{machineId}/history:
+    get:
+      tags:
+        - 设备监控
+      summary: 查询运行历史
+      description: 查询设备运行历史记录
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  dateRange:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        example: "2025-09-23T00:00:00Z"
+                      end:
+                        type: string
+                        example: "2025-09-23T23:59:59Z"
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timeSlot:
+                          type: string
+                          example: "08:00-12:00"
+                        status:
+                          type: string
+                          example: "运行中"
+                        program:
+                          type: string
+                          example: "PROGRAM-001"
+                        duration:
+                          type: number
+                          example: 4.0
+                        progress:
+                          type: integer
+                          example: 100
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+  /cnc/process/monitor/machines/{machineId}/alerts:
+    post:
+      tags:
+        - 设备监控
+      summary: 上传设备告警
+      description: 上传设备告警信息
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                alertType:
+                  type: string
+                  description: 告警类型
+                  example: "温度告警"
+                severity:
+                  type: string
+                  description: 严重程度
+                  example: "高"
+                message:
+                  type: string
+                  description: 告警信息
+                  example: "主轴温度超过阈值"
+              required:
+                - alertType
+                - severity
+                - message
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  alertId:
+                    type: integer
+                    example: 1695476400000
+                  alertType:
+                    type: string
+                    example: "温度告警"
+                  severity:
+                    type: string
+                    example: "高"
+                  message:
+                    type: string
+                    example: "主轴温度超过阈值"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: "未处理"
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+    get:
+      tags:
+        - 设备监控
+      summary: 查询设备告警
+      description: 查询设备告警信息列表
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  alerts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        alertId:
+                          type: integer
+                          example: 1
+                        alertType:
+                          type: string
+                          example: "温度告警"
+                        severity:
+                          type: string
+                          example: "高"
+                        message:
+                          type: string
+                          example: "主轴温度超过阈值"
+                        timestamp:
+                          type: string
+                          example: "2025-09-23T10:30:00Z"
+                        status:
+                          type: string
+                          example: "未处理"
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+  /cnc/process/monitor/machines/{machineId}/logs:
+    get:
+      tags:
+        - 设备监控
+      summary: 查询设备日志
+      description: 查询设备运行日志
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  dateRange:
+                    type: object
+                    properties:
+                      start:
+                        type: string
+                        example: "2025-09-23T00:00:00Z"
+                      end:
+                        type: string
+                        example: "2025-09-23T23:59:59Z"
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          example: "2025-09-23T08:00:00Z"
+                        message:
+                          type: string
+                          example: "系统启动"
+                        level:
+                          type: string
+                          example: "信息"
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+  /cnc/process/monitor/machines/{machineId}/temperature:
+    post:
+      tags:
+        - 数据监控
+      summary: 上传温度信息
+      description: 上传设备温度监测数据
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                spindleTemperature:
+                  type: number
+                  description: 主轴温度
+                  example: 45.2
+                motorTemperature:
+                  type: number
+                  description: 电机温度
+                  example: 38.5
+                ambientTemperature:
+                  type: number
+                  description: 环境温度
+                  example: 25.0
+              required:
+                - spindleTemperature
+                - motorTemperature
+                - ambientTemperature
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  spindleTemperature:
+                    type: number
+                    example: 45.2
+                  motorTemperature:
+                    type: number
+                    example: 38.5
+                  ambientTemperature:
+                    type: number
+                    example: 25.0
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+    get:
+      tags:
+        - 数据监控
+      summary: 查询温度信息
+      description: 查询设备当前温度信息
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+                  spindleTemperature:
+                    type: number
+                    example: 45.2
+                  motorTemperature:
+                    type: number
+                    example: 38.5
+                  ambientTemperature:
+                    type: number
+                    example: 25.0
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+  /cnc/process/monitor/machines/{machineId}/vibration:
+    post:
+      tags:
+        - 数据监控
+      summary: 上传振动数据
+      description: 上传设备振动监测数据
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                spindleVibration:
+                  type: number
+                  description: 主轴振动
+                  example: 0.05
+                motorVibration:
+                  type: number
+                  description: 电机振动
+                  example: 0.03
+                frameVibration:
+                  type: number
+                  description: 机体振动
+                  example: 0.02
+              required:
+                - spindleVibration
+                - motorVibration
+                - frameVibration
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  spindleVibration:
+                    type: number
+                    example: 0.05
+                  motorVibration:
+                    type: number
+                    example: 0.03
+                  frameVibration:
+                    type: number
+                    example: 0.02
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"
+    get:
+      tags:
+        - 数据监控
+      summary: 查询振动数据
+      description: 查询设备当前振动数据
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 设备ID
+          example: "MACHINE-001"
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+                  spindleVibration:
+                    type: number
+                    example: 0.05
+                  motorVibration:
+                    type: number
+                    example: 0.03
+                  frameVibration:
+                    type: number
+                    example: 0.02
+        '400':
+          description: 无效的设备ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设备ID"

@@ -1,0 +1,88 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Final API-Part 5
+  version: 1.0.0
+  description: AI 智能推荐相关，涵盖获取个性化，实时、行程、综合推荐、AI生成的行程建议
+servers:
+  - url: 'http://192.168.2.201:8083/travel-plans-final'
+paths:
+  '/{planId}/ai/recommendations/personalized':
+    get:
+      summary: 获取个性化推荐
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取个性化推荐
+        '400':
+          description: 无效参数
+  '/{planId}/ai/recommendations/real-time':
+    get:
+      summary: 获取实时推荐
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: currentLocation
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取实时推荐
+        '400':
+          description: 无效参数
+  '/{planId}/ai/recommendations/itinerary':
+    get:
+      summary: 获取AI生成的行程建议
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取行程建议
+        '400':
+          description: 无效计划ID
+  '/{planId}/ai/recommendations/activities':
+    get:
+      summary: 获取活动推荐
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取活动推荐
+        '400':
+          description: 无效计划ID
+  '/{planId}/ai/recommendations/comprehensive':
+    get:
+      summary: 获取综合推荐
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取综合推荐
+        '400':
+          description: 无效计划ID

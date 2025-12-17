@@ -1,0 +1,456 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Activities API
+  description: 旅游计划活动管理相关接口
+  version: 1.0.0
+servers:
+  - url: http://192.168.2.201:8083/travel-plans/activities
+paths:
+  /{planId}/reminders:
+    get:
+      summary: 获取旅游提醒列表
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: 计划ID
+      responses:
+        '200':
+          description: 成功获取提醒列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  planId:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        reminderId:
+                          type: integer
+                        planId:
+                          type: integer
+                        reminderTitle:
+                          type: string
+                        reminderTime:
+                          type: string
+                        reminderType:
+                          type: string
+                        description:
+                          type: string
+                        isCompleted:
+                          type: boolean
+        '400':
+          description: 无效的计划ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的计划ID"
+
+  /{planId}/reminders/{reminderId}:
+    put:
+      summary: 更新旅游提醒
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: 计划ID
+        - name: reminderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 101
+          description: 提醒ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reminderTitle:
+                  type: string
+                  example: "准备护照"
+                reminderTime:
+                  type: string
+                  example: "2023-07-01 09:00"
+                reminderType:
+                  type: string
+                  example: "准备"
+                description:
+                  type: string
+                  example: "准备护照的详细说明"
+                isCompleted:
+                  type: boolean
+                  example: false
+      responses:
+        '200':
+          description: 提醒更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  planId:
+                    type: integer
+                  reminderId:
+                    type: integer
+                  reminderTitle:
+                    type: string
+                  reminderTime:
+                    type: string
+                  reminderType:
+                    type: string
+                  description:
+                    type: string
+                  isCompleted:
+                    type: boolean
+                  updatedAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: 无效的计划ID或提醒ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的计划ID或提醒ID"
+
+    delete:
+      summary: 删除旅游提醒
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: reminderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 提醒删除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "提醒删除成功"
+                  reminderId:
+                    type: integer
+                  planId:
+                    type: integer
+                  deletedAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: 无效的计划ID或提醒ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的计划ID或提醒ID"
+
+  /{planId}/notes:
+    post:
+      summary: 添加旅游笔记
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                noteTitle:
+                  type: string
+                  example: "巴黎印象"
+                noteContent:
+                  type: string
+                  example: "详细内容描述"
+                noteType:
+                  type: string
+                  example: "印象"
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: 添加成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 201
+                  noteId:
+                    type: integer
+                  planId:
+                    type: integer
+                  noteTitle:
+                    type: string
+                  noteContent:
+                    type: string
+                  noteType:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: 无效计划ID或缺少必填字段
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+
+    get:
+      summary: 获取旅游笔记列表
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取笔记列表成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  planId:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        noteId:
+                          type: integer
+                        planId:
+                          type: integer
+                        noteTitle:
+                          type: string
+                        noteContent:
+                          type: string
+                        noteType:
+                          type: string
+                        tags:
+                          type: array
+                          items:
+                            type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+        '400':
+          description: 无效计划ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+
+  /{planId}/notes/{noteId}:
+    put:
+      summary: 更新旅游笔记
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                noteTitle:
+                  type: string
+                noteContent:
+                  type: string
+                noteType:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: 笔记更新成功
+        '400':
+          description: 无效计划ID或笔记ID
+
+    delete:
+      summary: 删除旅游笔记
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 笔记删除成功
+        '400':
+          description: 无效计划ID或笔记ID
+
+  /{planId}/companions:
+    post:
+      summary: 添加旅游同伴
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                companionName:
+                  type: string
+                companionPhone:
+                  type: string
+                companionEmail:
+                  type: string
+                relationship:
+                  type: string
+                emergencyContact:
+                  type: string
+      responses:
+        '201':
+          description: 添加成功
+        '400':
+          description: 无效计划ID或缺少必填字段
+
+    get:
+      summary: 获取旅游同伴列表
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取成功
+        '400':
+          description: 无效计划ID
+
+  /{planId}/companions/{companionId}:
+    put:
+      summary: 更新旅游同伴
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: companionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                companionName:
+                  type: string
+                companionPhone:
+                  type: string
+                companionEmail:
+                  type: string
+                relationship:
+                  type: string
+                emergencyContact:
+                  type: string
+      responses:
+        '200':
+          description: 同伴信息更新成功
+        '400':
+          description: 无效计划ID或同伴ID

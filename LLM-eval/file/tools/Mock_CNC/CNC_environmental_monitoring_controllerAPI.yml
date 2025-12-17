@@ -1,0 +1,710 @@
+openapi: 3.0.3
+info:
+  title: CNC环境监控控制器API
+  description: CNC加工环境监控相关接口
+  version: 1.0.0
+  contact:
+    name: CNC环境监控API
+servers:
+  - url: http://192.168.2.201:8083
+    description: 开发环境服务器
+tags:
+  - name: 环境监控
+    description: 环境数据监控相关操作
+paths:
+  /cnc/process/environment/temperature:
+    post:
+      tags:
+        - 环境监控
+      summary: 上传环境温度数据
+      description: 上传环境温度监测数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                  description: 监测位置
+                  example: "生产车间"
+                temperature:
+                  type: number
+                  description: 温度值
+                  example: 25.5
+              required:
+                - location
+                - temperature
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  recordId:
+                    type: integer
+                    description: 记录ID
+                    example: 1695476400000
+                  location:
+                    type: string
+                    example: "生产车间"
+                  temperature:
+                    type: number
+                    example: 25.5
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-09-23T10:30:00Z"
+    get:
+      tags:
+        - 环境监控
+      summary: 查询环境温度数据
+      description: 获取当前环境温度监测数据
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  location:
+                    type: string
+                    example: "生产车间"
+                  temperature:
+                    type: number
+                    example: 25.5
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+                  status:
+                    type: string
+                    example: "正常"
+  /cnc/process/environment/humidity:
+    post:
+      tags:
+        - 环境监控
+      summary: 上传环境湿度数据
+      description: 上传环境湿度监测数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                  description: 监测位置
+                  example: "生产车间"
+                humidity:
+                  type: number
+                  description: 湿度值
+                  example: 65.0
+              required:
+                - location
+                - humidity
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  recordId:
+                    type: integer
+                    example: 1695476400000
+                  location:
+                    type: string
+                    example: "生产车间"
+                  humidity:
+                    type: number
+                    example: 65.0
+                  timestamp:
+                    type: string
+                    format: date-time
+    get:
+      tags:
+        - 环境监控
+      summary: 查询环境湿度数据
+      description: 获取当前环境湿度监测数据
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  location:
+                    type: string
+                    example: "生产车间"
+                  humidity:
+                    type: number
+                    example: 65.0
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+                  status:
+                    type: string
+                    example: "正常"
+  /cnc/process/environment/air-quality:
+    post:
+      tags:
+        - 环境监控
+      summary: 上传空气质量数据
+      description: 上传空气质量监测数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                  description: 监测位置
+                  example: "生产车间"
+                pm25:
+                  type: number
+                  description: PM2.5浓度
+                  example: 35.0
+                pm10:
+                  type: number
+                  description: PM10浓度
+                  example: 50.0
+                co2:
+                  type: number
+                  description: 二氧化碳浓度
+                  example: 450.0
+              required:
+                - location
+                - pm25
+                - pm10
+                - co2
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  recordId:
+                    type: integer
+                    example: 1695476400000
+                  location:
+                    type: string
+                    example: "生产车间"
+                  pm25:
+                    type: number
+                    example: 35.0
+                  pm10:
+                    type: number
+                    example: 50.0
+                  co2:
+                    type: number
+                    example: 450.0
+                  timestamp:
+                    type: string
+                    format: date-time
+    get:
+      tags:
+        - 环境监控
+      summary: 查询空气质量数据
+      description: 获取当前空气质量监测数据
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  location:
+                    type: string
+                    example: "生产车间"
+                  pm25:
+                    type: number
+                    example: 35.0
+                  pm10:
+                    type: number
+                    example: 50.0
+                  co2:
+                    type: number
+                    example: 450.0
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+                  status:
+                    type: string
+                    example: "良好"
+  /cnc/process/environment/vibration:
+    post:
+      tags:
+        - 环境监控
+      summary: 上传环境振动数据
+      description: 上传环境振动监测数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                  description: 监测位置
+                  example: "生产车间"
+                vibration:
+                  type: number
+                  description: 振动值
+                  example: 0.02
+              required:
+                - location
+                - vibration
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  recordId:
+                    type: integer
+                    example: 1695476400000
+                  location:
+                    type: string
+                    example: "生产车间"
+                  vibration:
+                    type: number
+                    example: 0.02
+                  timestamp:
+                    type: string
+                    format: date-time
+    get:
+      tags:
+        - 环境监控
+      summary: 查询环境振动数据
+      description: 获取当前环境振动监测数据
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  location:
+                    type: string
+                    example: "生产车间"
+                  vibration:
+                    type: number
+                    example: 0.02
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+                  status:
+                    type: string
+                    example: "正常"
+  /cnc/process/environment/noise:
+    post:
+      tags:
+        - 环境监控
+      summary: 上传环境噪声数据
+      description: 上传环境噪声监测数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                  description: 监测位置
+                  example: "生产车间"
+                noise:
+                  type: number
+                  description: 噪声值
+                  example: 75.0
+              required:
+                - location
+                - noise
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  recordId:
+                    type: integer
+                    example: 1695476400000
+                  location:
+                    type: string
+                    example: "生产车间"
+                  noise:
+                    type: number
+                    example: 75.0
+                  timestamp:
+                    type: string
+                    format: date-time
+    get:
+      tags:
+        - 环境监控
+      summary: 查询环境噪声数据
+      description: 获取当前环境噪声监测数据
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  location:
+                    type: string
+                    example: "生产车间"
+                  noise:
+                    type: number
+                    example: 75.0
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+                  status:
+                    type: string
+                    example: "正常"
+  /cnc/process/environment/light:
+    post:
+      tags:
+        - 环境监控
+      summary: 上传光照数据
+      description: 上传环境光照监测数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                  description: 监测位置
+                  example: "生产车间"
+                illuminance:
+                  type: number
+                  description: 照度值
+                  example: 500.0
+              required:
+                - location
+                - illuminance
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  recordId:
+                    type: integer
+                    example: 1695476400000
+                  location:
+                    type: string
+                    example: "生产车间"
+                  illuminance:
+                    type: number
+                    example: 500.0
+                  timestamp:
+                    type: string
+                    format: date-time
+    get:
+      tags:
+        - 环境监控
+      summary: 查询光照数据
+      description: 获取当前环境光照监测数据
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  location:
+                    type: string
+                    example: "生产车间"
+                  illuminance:
+                    type: number
+                    example: 500.0
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+                  status:
+                    type: string
+                    example: "正常"
+  /cnc/process/environment/power:
+    post:
+      tags:
+        - 环境监控
+      summary: 上传环境电能消耗
+      description: 上传环境电能消耗数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                  description: 监测位置
+                  example: "生产车间"
+                powerConsumption:
+                  type: number
+                  description: 电能消耗
+                  example: 1250.0
+              required:
+                - location
+                - powerConsumption
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  recordId:
+                    type: integer
+                    example: 1695476400000
+                  location:
+                    type: string
+                    example: "生产车间"
+                  powerConsumption:
+                    type: number
+                    example: 1250.0
+                  timestamp:
+                    type: string
+                    format: date-time
+    get:
+      tags:
+        - 环境监控
+      summary: 查询环境电能消耗
+      description: 获取当前环境电能消耗数据
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  location:
+                    type: string
+                    example: "生产车间"
+                  powerConsumption:
+                    type: number
+                    example: 1250.0
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+  /cnc/process/environment/summary:
+    get:
+      tags:
+        - 环境监控
+      summary: 查询环境监控汇总
+      description: 获取环境监控数据汇总信息
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  location:
+                    type: string
+                    example: "生产车间"
+                  timestamp:
+                    type: string
+                    example: "2025-09-23T10:30:00Z"
+                  summary:
+                    type: object
+                    properties:
+                      temperature:
+                        type: object
+                        properties:
+                          value:
+                            type: number
+                            example: 25.5
+                          status:
+                            type: string
+                            example: "正常"
+                          unit:
+                            type: string
+                            example: "°C"
+                      humidity:
+                        type: object
+                        properties:
+                          value:
+                            type: number
+                            example: 65.0
+                          status:
+                            type: string
+                            example: "正常"
+                          unit:
+                            type: string
+                            example: "%"
+                      airQuality:
+                        type: object
+                        properties:
+                          pm25:
+                            type: number
+                            example: 35.0
+                          pm10:
+                            type: number
+                            example: 50.0
+                          co2:
+                            type: number
+                            example: 450.0
+                          status:
+                            type: string
+                            example: "良好"
+                      vibration:
+                        type: object
+                        properties:
+                          value:
+                            type: number
+                            example: 0.02
+                          status:
+                            type: string
+                            example: "正常"
+                          unit:
+                            type: string
+                            example: "mm/s"
+                      noise:
+                        type: object
+                        properties:
+                          value:
+                            type: number
+                            example: 75.0
+                          status:
+                            type: string
+                            example: "正常"
+                          unit:
+                            type: string
+                            example: "dB"
+                      light:
+                        type: object
+                        properties:
+                          value:
+                            type: number
+                            example: 500.0
+                          status:
+                            type: string
+                            example: "正常"
+                          unit:
+                            type: string
+                            example: "lux"
+                      power:
+                        type: object
+                        properties:
+                          value:
+                            type: number
+                            example: 1250.0
+                          unit:
+                            type: string
+                            example: "kWh"
+  /cnc/process/environment/alerts:
+    get:
+      tags:
+        - 环境监控
+      summary: 查询环境告警信息
+      description: 获取环境监控告警信息列表
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  alerts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        alertId:
+                          type: integer
+                          example: 1
+                        alertType:
+                          type: string
+                          example: "温度告警"
+                        severity:
+                          type: string
+                          example: "中"
+                        message:
+                          type: string
+                          example: "车间温度超过阈值"
+                        timestamp:
+                          type: string
+                          example: "2025-09-23T10:30:00Z"
+                        status:
+                          type: string
+                          example: "未处理"

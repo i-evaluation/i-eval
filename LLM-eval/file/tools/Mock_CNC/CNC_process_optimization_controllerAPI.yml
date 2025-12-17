@@ -1,0 +1,736 @@
+openapi: 3.0.3
+info:
+  title: CNC工艺优化控制器API
+  description: CNC工艺参数优化和试验记录管理相关接口
+  version: 1.0.0
+  contact:
+    name: CNC工艺优化API
+servers:
+  - url: http://192.168.2.201:8083
+    description: 开发环境服务器
+tags:
+  - name: 工艺参数
+    description: 工艺参数管理相关操作
+  - name: 优化建议
+    description: 工艺优化建议相关操作
+  - name: 试验记录
+    description: 工艺试验记录相关操作
+  - name: 优化设置
+    description: 工艺优化设置相关操作
+paths:
+  /cnc/process/optimization/parameters:
+    post:
+      tags:
+        - 工艺参数
+      summary: 上传加工参数
+      description: 上传工艺加工参数数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                machineId:
+                  type: string
+                  description: 设备ID
+                  example: "MACHINE-001"
+                workpieceMaterial:
+                  type: string
+                  description: 工件材料
+                  example: "铝合金"
+                toolType:
+                  type: string
+                  description: 刀具类型
+                  example: "硬质合金铣刀"
+                parameters:
+                  type: object
+                  description: 工艺参数
+                  properties:
+                    spindleSpeed:
+                      type: integer
+                      example: 12000
+                    feedRate:
+                      type: integer
+                      example: 500
+                    cuttingDepth:
+                      type: number
+                      example: 2.5
+                    coolantPressure:
+                      type: number
+                      example: 0.5
+                performance:
+                  type: object
+                  description: 性能指标
+                  properties:
+                    surfaceFinish:
+                      type: number
+                      example: 0.8
+                    toolLife:
+                      type: number
+                      example: 8.0
+                    materialRemovalRate:
+                      type: number
+                      example: 15.5
+                createdBy:
+                  type: string
+                  description: 创建人
+                  example: "工艺工程师"
+              required:
+                - machineId
+                - workpieceMaterial
+                - toolType
+                - parameters
+                - performance
+                - createdBy
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  paramId:
+                    type: integer
+                    example: 1695476400000
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  workpieceMaterial:
+                    type: string
+                    example: "铝合金"
+                  toolType:
+                    type: string
+                    example: "硬质合金铣刀"
+                  parameters:
+                    type: object
+                    properties:
+                      spindleSpeed:
+                        type: integer
+                        example: 12000
+                      feedRate:
+                        type: integer
+                        example: 500
+                      cuttingDepth:
+                        type: number
+                        example: 2.5
+                      coolantPressure:
+                        type: number
+                        example: 0.5
+                  performance:
+                    type: object
+                    properties:
+                      surfaceFinish:
+                        type: number
+                        example: 0.8
+                      toolLife:
+                        type: number
+                        example: 8.0
+                      materialRemovalRate:
+                        type: number
+                        example: 15.5
+                  createdBy:
+                    type: string
+                    example: "工艺工程师"
+                  createdAt:
+                    type: string
+                    format: date-time
+  /cnc/process/optimization/parameters/{paramId}:
+    get:
+      tags:
+        - 工艺参数
+      summary: 查询加工参数
+      description: 根据参数ID查询工艺参数详情
+      parameters:
+        - name: paramId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 参数ID
+          example: 1695476400000
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  paramId:
+                    type: integer
+                    example: 1695476400000
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  workpieceMaterial:
+                    type: string
+                    example: "铝合金"
+                  toolType:
+                    type: string
+                    example: "硬质合金铣刀"
+                  parameters:
+                    type: object
+                    properties:
+                      spindleSpeed:
+                        type: integer
+                        example: 12000
+                      feedRate:
+                        type: integer
+                        example: 500
+                      cuttingDepth:
+                        type: number
+                        example: 2.5
+                      coolantPressure:
+                        type: number
+                        example: 0.5
+                  performance:
+                    type: object
+                    properties:
+                      surfaceFinish:
+                        type: number
+                        example: 0.8
+                      toolLife:
+                        type: number
+                        example: 8.0
+                      materialRemovalRate:
+                        type: number
+                        example: 15.5
+                  createdBy:
+                    type: string
+                    example: "工艺工程师"
+                  createdAt:
+                    type: string
+                    example: "2025-09-23T10:00:00Z"
+        '400':
+          description: 无效的参数ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的参数ID"
+  /cnc/process/optimization/recommendations:
+    get:
+      tags:
+        - 优化建议
+      summary: 获取工艺优化建议
+      description: 获取基于历史数据的工艺优化建议
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  recommendations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                          example: "提高主轴转速"
+                        description:
+                          type: string
+                          example: "将主轴转速从12000rpm提高到14000rpm可提高材料去除率"
+                        priority:
+                          type: string
+                          example: "高"
+                  generatedAt:
+                    type: string
+                    format: date-time
+  /cnc/process/optimization/trials:
+    post:
+      tags:
+        - 试验记录
+      summary: 上传试验记录
+      description: 上传工艺试验记录数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                machineId:
+                  type: string
+                  description: 设备ID
+                  example: "MACHINE-001"
+                workpieceMaterial:
+                  type: string
+                  description: 工件材料
+                  example: "铝合金"
+                toolType:
+                  type: string
+                  description: 刀具类型
+                  example: "硬质合金铣刀"
+                testParameters:
+                  type: object
+                  description: 试验参数
+                  properties:
+                    spindleSpeed:
+                      type: integer
+                      example: 14000
+                    feedRate:
+                      type: integer
+                      example: 450
+                    cuttingDepth:
+                      type: number
+                      example: 2.0
+                results:
+                  type: object
+                  description: 试验结果
+                  properties:
+                    surfaceFinish:
+                      type: number
+                      example: 0.9
+                    toolLife:
+                      type: number
+                      example: 10.0
+                    materialRemovalRate:
+                      type: number
+                      example: 12.6
+                conclusions:
+                  type: string
+                  description: 试验结论
+                  example: "提高主轴转速并降低进给率和切削深度可显著改善表面光洁度和刀具寿命"
+                conductedBy:
+                  type: string
+                  description: 试验人员
+                  example: "工艺工程师"
+              required:
+                - machineId
+                - workpieceMaterial
+                - toolType
+                - testParameters
+                - results
+                - conclusions
+                - conductedBy
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  trialId:
+                    type: integer
+                    example: 1695476400000
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  workpieceMaterial:
+                    type: string
+                    example: "铝合金"
+                  toolType:
+                    type: string
+                    example: "硬质合金铣刀"
+                  testParameters:
+                    type: object
+                    properties:
+                      spindleSpeed:
+                        type: integer
+                        example: 14000
+                      feedRate:
+                        type: integer
+                        example: 450
+                      cuttingDepth:
+                        type: number
+                        example: 2.0
+                  results:
+                    type: object
+                    properties:
+                      surfaceFinish:
+                        type: number
+                        example: 0.9
+                      toolLife:
+                        type: number
+                        example: 10.0
+                      materialRemovalRate:
+                        type: number
+                        example: 12.6
+                  conclusions:
+                    type: string
+                    example: "提高主轴转速并降低进给率和切削深度可显著改善表面光洁度和刀具寿命"
+                  conductedBy:
+                    type: string
+                    example: "工艺工程师"
+                  conductedAt:
+                    type: string
+                    format: date-time
+  /cnc/process/optimization/trials/{trialId}:
+    get:
+      tags:
+        - 试验记录
+      summary: 查询试验记录
+      description: 根据试验ID查询试验记录详情
+      parameters:
+        - name: trialId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 试验ID
+          example: 1695476400000
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  trialId:
+                    type: integer
+                    example: 1695476400000
+                  machineId:
+                    type: string
+                    example: "MACHINE-001"
+                  workpieceMaterial:
+                    type: string
+                    example: "铝合金"
+                  toolType:
+                    type: string
+                    example: "硬质合金铣刀"
+                  testParameters:
+                    type: object
+                    properties:
+                      spindleSpeed:
+                        type: integer
+                        example: 14000
+                      feedRate:
+                        type: integer
+                        example: 450
+                      cuttingDepth:
+                        type: number
+                        example: 2.0
+                  results:
+                    type: object
+                    properties:
+                      surfaceFinish:
+                        type: number
+                        example: 0.9
+                      toolLife:
+                        type: number
+                        example: 10.0
+                      materialRemovalRate:
+                        type: number
+                        example: 12.6
+                  conclusions:
+                    type: string
+                    example: "提高主轴转速并降低进给率和切削深度可显著改善表面光洁度和刀具寿命"
+                  conductedBy:
+                    type: string
+                    example: "工艺工程师"
+                  conductedAt:
+                    type: string
+                    example: "2025-09-23T14:00:00Z"
+        '400':
+          description: 无效的试验ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的试验ID"
+  /cnc/process/optimization/history:
+    get:
+      tags:
+        - 优化建议
+      summary: 查询工艺改进历史
+      description: 查询工艺优化改进历史记录
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        historyId:
+                          type: integer
+                          example: 1
+                        title:
+                          type: string
+                          example: "主轴转速优化"
+                        description:
+                          type: string
+                          example: "将主轴转速从10000rpm提高到12000rpm"
+                        date:
+                          type: string
+                          example: "2025-09-15T10:00:00Z"
+                        impact:
+                          type: string
+                          example: "材料去除率提高15%"
+  /cnc/process/optimization/reports:
+    get:
+      tags:
+        - 优化建议
+      summary: 查询优化分析报表
+      description: 查询工艺优化分析报表列表
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  reports:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        reportId:
+                          type: integer
+                          example: 1
+                        title:
+                          type: string
+                          example: "月度工艺优化报告"
+                        dateRange:
+                          type: object
+                          properties:
+                            start:
+                              type: string
+                              example: "2025-09-01T00:00:00Z"
+                            end:
+                              type: string
+                              example: "2025-09-30T23:59:59Z"
+                        author:
+                          type: string
+                          example: "工艺工程师"
+  /cnc/process/optimization/settings:
+    post:
+      tags:
+        - 优化设置
+      summary: 上传工艺优化设置
+      description: 上传工艺优化配置设置
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                settingName:
+                  type: string
+                  description: 设置名称
+                  example: "铝合金加工优化"
+                optimizationTarget:
+                  type: string
+                  description: 优化目标
+                  example: "表面光洁度"
+                constraints:
+                  type: object
+                  description: 约束条件
+                  properties:
+                    maxSpindleSpeed:
+                      type: integer
+                      example: 15000
+                    maxFeedRate:
+                      type: integer
+                      example: 600
+                    maxCuttingDepth:
+                      type: number
+                      example: 3.0
+                parameters:
+                  type: object
+                  description: 优化参数
+                  properties:
+                    spindleSpeed:
+                      type: integer
+                      example: 12000
+                    feedRate:
+                      type: integer
+                      example: 500
+                    cuttingDepth:
+                      type: number
+                      example: 2.5
+                isActive:
+                  type: boolean
+                  description: 是否激活
+                  example: true
+                createdBy:
+                  type: string
+                  description: 创建人
+                  example: "工艺工程师"
+              required:
+                - settingName
+                - optimizationTarget
+                - constraints
+                - parameters
+                - isActive
+                - createdBy
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  settingId:
+                    type: integer
+                    example: 1695476400000
+                  settingName:
+                    type: string
+                    example: "铝合金加工优化"
+                  optimizationTarget:
+                    type: string
+                    example: "表面光洁度"
+                  constraints:
+                    type: object
+                    properties:
+                      maxSpindleSpeed:
+                        type: integer
+                        example: 15000
+                      maxFeedRate:
+                        type: integer
+                        example: 600
+                      maxCuttingDepth:
+                        type: number
+                        example: 3.0
+                  parameters:
+                    type: object
+                    properties:
+                      spindleSpeed:
+                        type: integer
+                        example: 12000
+                      feedRate:
+                        type: integer
+                        example: 500
+                      cuttingDepth:
+                        type: number
+                        example: 2.5
+                  isActive:
+                    type: boolean
+                    example: true
+                  createdBy:
+                    type: string
+                    example: "工艺工程师"
+                  createdAt:
+                    type: string
+                    format: date-time
+  /cnc/process/optimization/settings/{settingId}:
+    get:
+      tags:
+        - 优化设置
+      summary: 查询工艺优化设置
+      description: 根据设置ID查询工艺优化设置详情
+      parameters:
+        - name: settingId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 设置ID
+          example: 1695476400000
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  settingId:
+                    type: integer
+                    example: 1695476400000
+                  settingName:
+                    type: string
+                    example: "铝合金加工优化"
+                  optimizationTarget:
+                    type: string
+                    example: "表面光洁度"
+                  constraints:
+                    type: object
+                    properties:
+                      maxSpindleSpeed:
+                        type: integer
+                        example: 15000
+                      maxFeedRate:
+                        type: integer
+                        example: 600
+                      maxCuttingDepth:
+                        type: number
+                        example: 3.0
+                  parameters:
+                    type: object
+                    properties:
+                      spindleSpeed:
+                        type: integer
+                        example: 12000
+                      feedRate:
+                        type: integer
+                        example: 500
+                      cuttingDepth:
+                        type: number
+                        example: 2.5
+                  isActive:
+                    type: boolean
+                    example: true
+                  createdBy:
+                    type: string
+                    example: "工艺工程师"
+                  createdAt:
+                    type: string
+                    example: "2025-09-01T10:00:00Z"
+        '400':
+          description: 无效的设置ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的设置ID"

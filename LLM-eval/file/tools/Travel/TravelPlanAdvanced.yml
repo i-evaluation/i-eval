@@ -1,0 +1,273 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Advanced API
+  version: 1.0.0
+  description: 高级旅游计划接口，涵盖景点推荐、活动推荐、门票和导览预订等功能
+servers:
+  - url: http://192.168.2.201:8083/travel-plans-advanced
+paths:
+  /{planId}/attractions/recommendations:
+    get:
+      summary: 获取景点推荐
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+            default: all
+      responses:
+        '200':
+          description: 成功返回景点推荐
+          content:
+            application/json:
+              example:
+                code: 200
+                planId: 1
+                destination: 巴黎
+                category: all
+                attractions:
+                  - name: 埃菲尔铁塔
+                    category: 地标建筑
+                    rating: 4.8
+                    visitTime: 2小时
+                    price: 25欧元
+                    description: 埃菲尔铁塔是巴黎的著名景点
+                    recommended: true
+                generatedAt: '2025-09-22T10:00:00Z'
+
+  /{planId}/attractions/{attractionId}:
+    get:
+      summary: 获取景点详情
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: attractionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功返回景点详情
+          content:
+            application/json:
+              example:
+                code: 200
+                planId: 1
+                attractionId: 1
+                details:
+                  name: 埃菲尔铁塔
+                  description: 巴黎的标志性建筑，高324米
+                  address: 战神广场，巴黎
+                  openingHours: 09:30-23:45
+                  price: 25欧元
+                  rating: 4.8
+                  visitTime: 2-3小时
+                  bestTime: 日落时分
+                  tips:
+                    - 提前预订门票
+                    - 避开旅游高峰期
+                    - 带好相机
+                generatedAt: '2025-09-22T10:00:00Z'
+
+  /{planId}/activities/recommendations:
+    get:
+      summary: 获取活动推荐
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            default: all
+      responses:
+        '200':
+          description: 成功返回活动推荐
+          content:
+            application/json:
+              example:
+                code: 200
+                planId: 1
+                destination: 巴黎
+                type: all
+                activities:
+                  - name: 塞纳河游船
+                    type: 观光
+                    price: 15欧元
+                    duration: 1小时
+                    rating: 4.5
+                    description: 塞纳河游船是巴黎的热门活动
+                    recommended: true
+                generatedAt: '2025-09-22T10:00:00Z'
+
+  /{planId}/attractions/{attractionId}/book:
+    post:
+      summary: 预订景点门票
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: attractionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                visitDate:
+                  type: string
+                  format: date
+                visitTime:
+                  type: string
+                quantity:
+                  type: integer
+                ticketType:
+                  type: string
+                totalPrice:
+                  type: number
+      responses:
+        '201':
+          description: 预订成功
+          content:
+            application/json:
+              example:
+                code: 201
+                bookingId: 1234567890
+                planId: 1
+                attractionId: 1
+                visitDate: 2025-10-01
+                visitTime: 14:00
+                quantity: 2
+                ticketType: 成人票
+                totalPrice: 50
+                status: confirmed
+                bookedAt: '2025-09-22T10:00:00Z'
+
+  /{planId}/attractions/bookings/{bookingId}:
+    get:
+      summary: 获取门票预订状态
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 返回门票预订状态
+          content:
+            application/json:
+              example:
+                code: 200
+                planId: 1
+                bookingId: 1234567890
+                status: confirmed
+                attractionName: 埃菲尔铁塔
+                visitDate: 2025-10-01
+                visitTime: 14:00
+                quantity: 2
+                ticketType: 成人票
+                totalPrice: 50欧元
+                qrCode: QR123456789
+                lastUpdated: '2025-09-22T10:00:00Z'
+
+    delete:
+      summary: 取消景点门票预订
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 取消成功
+          content:
+            application/json:
+              example:
+                code: 200
+                planId: 1
+                bookingId: 1234567890
+                status: cancelled
+                cancelledAt: '2025-09-22T10:00:00Z'
+                refundAmount: 50欧元
+                refundStatus: 处理中
+
+  /{planId}/attractions/{attractionId}/hours:
+    get:
+      summary: 获取景点开放时间
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: attractionId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 返回景点开放时间
+          content:
+            application/json:
+              example:
+                code: 200
+                planId: 1
+                attractionId: 1
+                hours:
+                  monday: 09:30-23:45
+                  tuesday: 09:30-23:45
+                  wednesday: 09:30-23:45
+                  thursday: 09:30-23:45
+                  friday: 09:30-23:45
+                  saturday: 09:30-23:45
+                  sunday: 09:30-23:45
+                  holidays: 09:30-23:45
+                  lastEntry: 23:00
+                generatedAt: '2025-09-22T10:00:00Z'
+
+# 其余接口 (景点评价、照片、附近设施、最佳时间、排队时间、历史、导览、活动日历、统计、比较、推荐路线等)
+# 可按同样格式继续添加 paths 下的每个 endpoint

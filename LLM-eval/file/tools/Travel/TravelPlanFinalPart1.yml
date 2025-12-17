@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Final API-Part 1
+  version: 1.0.0
+  description: 美食和餐厅相关
+servers:
+  - url: 'http://l192.168.2.201:8083/travel-plans-final'
+paths:
+  '/{planId}/restaurants/recommendations':
+    get:
+      summary: 获取餐厅推荐
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取餐厅推荐
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 无效的计划ID
+  '/{planId}/food/recommendations':
+    get:
+      summary: 获取美食推荐
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取美食推荐
+        '400':
+          description: 无效的计划ID
+  '/{planId}/restaurants/{restaurantId}/book':
+    post:
+      summary: 餐厅预订
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reservationDate:
+                  type: string
+                  example: '2023-06-25'
+                reservationTime:
+                  type: string
+                  example: '19:00'
+                guests:
+                  type: integer
+                  example: 2
+      responses:
+        '201':
+          description: 预订成功
+        '400':
+          description: 参数错误
+  '/{planId}/restaurants/{restaurantId}/reviews':
+    get:
+      summary: 获取餐厅评价
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取评价
+        '400':
+          description: 参数错误
+  '/{planId}/food/map':
+    get:
+      summary: 获取美食地图
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取美食地图
+        '400':
+          description: 参数错误

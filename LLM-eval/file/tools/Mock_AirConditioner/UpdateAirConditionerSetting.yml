@@ -1,0 +1,284 @@
+openapi: 3.0.0
+info:
+  title: 空调设备更新接口
+  description: 更新空调设备的各项参数设置
+  version: 1.0.0
+servers:
+  - url: http://192.168.2.201:8083
+paths:
+  /api/air-conditioner/update:
+    post:
+      summary: 更新空调设备参数
+      description: 更新空调设备的各项运行参数，包括温度、风速、模式等设置
+      operationId: updateAirConditioner
+      tags:
+        - 空调设备管理
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deviceId
+                - mode
+                - powerStatus
+              properties:
+                deviceId:
+                  type: string
+                  description: 设备ID
+                  example: "AC001"
+                mode:
+                  type: string
+                  description: 运行模式
+                  enum: [cool, heat, fan, auto, dry]
+                  example: "cool"
+                powerStatus:
+                  type: string
+                  description: 电源状态
+                  enum: [on, off]
+                  example: "on"
+                temperature:
+                  type: integer
+                  description: 目标温度
+                  minimum: 16
+                  maximum: 30
+                  example: 26
+                fanSpeed:
+                  type: string
+                  description: 风速设置
+                  enum: [auto, low, medium, high]
+                  example: "auto"
+                swing:
+                  type: boolean
+                  description: 摆风功能
+                  example: false
+                ecoMode:
+                  type: boolean
+                  description: 节能模式
+                  example: false
+                sleepMode:
+                  type: boolean
+                  description: 睡眠模式
+                  example: false
+                timerOn:
+                  type: integer
+                  description: 定时开启时间（分钟）
+                  example: 60
+                timerOff:
+                  type: integer
+                  description: 定时关闭时间（分钟）
+                  example: 120
+                humidity:
+                  type: integer
+                  description: 湿度设置
+                  minimum: 30
+                  maximum: 80
+                  example: 50
+                airQuality:
+                  type: string
+                  description: 空气质量
+                  enum: [excellent, good, fair, poor]
+                  example: "good"
+                filterStatus:
+                  type: string
+                  description: 滤网状态
+                  enum: [normal, need_clean, need_replace]
+                  example: "normal"
+                lock:
+                  type: boolean
+                  description: 锁定状态
+                  example: false
+                mute:
+                  type: boolean
+                  description: 静音状态
+                  example: false
+                display:
+                  type: boolean
+                  description: 显示屏状态
+                  example: true
+                healthMode:
+                  type: boolean
+                  description: 健康模式
+                  example: false
+                windDirection:
+                  type: string
+                  description: 风向设置
+                  enum: [auto, up, down, left, right]
+                  example: "auto"
+                freshAir:
+                  type: boolean
+                  description: 新风功能
+                  example: false
+                uvSterilize:
+                  type: boolean
+                  description: UV杀菌功能
+                  example: false
+                energySave:
+                  type: boolean
+                  description: 节能功能
+                  example: false
+                autoClean:
+                  type: boolean
+                  description: 自清洁功能
+                  example: false
+                smartEye:
+                  type: boolean
+                  description: 智能眼功能
+                  example: false
+                turboMode:
+                  type: boolean
+                  description: 强力模式
+                  example: false
+                quietMode:
+                  type: boolean
+                  description: 静音模式
+                  example: false
+                temperatureUnit:
+                  type: string
+                  description: 温度单位
+                  enum: [celsius, fahrenheit]
+                  example: "celsius"
+                breezeMode:
+                  type: boolean
+                  description: 微风模式
+                  example: false
+                selfDiagnosis:
+                  type: boolean
+                  description: 自诊断功能
+                  example: false
+                remoteControl:
+                  type: boolean
+                  description: 遥控功能
+                  example: true
+                voiceControl:
+                  type: boolean
+                  description: 语音控制
+                  example: false
+                wifiStatus:
+                  type: string
+                  description: WiFi连接状态
+                  enum: [connected, disconnected, connecting]
+                  example: "connected"
+                firmwareVersion:
+                  type: string
+                  description: 固件版本
+                  example: "1.0.0"
+      responses:
+        '201':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: 响应状态码
+                    example: 201
+                  deviceId:
+                    type: string
+                    description: 设备ID
+                    example: "AC001"
+                  userId:
+                    type: string
+                    description: 用户ID
+                    example: "user123"
+                  mode:
+                    type: string
+                    description: 运行模式
+                    example: "cool"
+                  powerStatus:
+                    type: string
+                    description: 电源状态
+                    example: "on"
+                  temperature:
+                    type: integer
+                    description: 目标温度
+                    example: 26
+                  fanSpeed:
+                    type: string
+                    description: 风速设置
+                    example: "auto"
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: 更新时间
+                    example: "2024-01-15T10:30:00Z"
+                  operationCount:
+                    type: integer
+                    description: 操作次数
+                    example: 1
+                  lastMaintenanceDate:
+                    type: string
+                    description: 最后维护日期
+                    example: null
+                  totalRunningHours:
+                    type: integer
+                    description: 总运行小时数
+                    example: 0
+        '401':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: 错误状态码
+                    example: 401
+                  message:
+                    type: string
+                    description: 错误信息
+                    example: "请求参数异常：缺少必要参数deviceId、userId、mode或powerStatus"
+components:
+  schemas:
+    AirConditionerUpdateRequest:
+      type: object
+      required:
+        - deviceId
+        - userId
+        - mode
+        - powerStatus
+      properties:
+        deviceId:
+          type: string
+          description: 设备ID
+        userId:
+          type: string
+          description: 用户ID
+        mode:
+          type: string
+          description: 运行模式
+        powerStatus:
+          type: string
+          description: 电源状态
+        temperature:
+          type: integer
+          description: 目标温度
+        fanSpeed:
+          type: string
+          description: 风速设置
+    AirConditionerUpdateResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 响应状态码
+        deviceId:
+          type: string
+          description: 设备ID
+        userId:
+          type: string
+          description: 用户ID
+        mode:
+          type: string
+          description: 运行模式
+        powerStatus:
+          type: string
+          description: 电源状态
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间

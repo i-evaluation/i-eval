@@ -1,0 +1,163 @@
+# OpenAPI 规范版本
+openapi: 3.0.3
+
+# API 基本信息
+info:
+  title: 用户博客帖子 API
+  description: |-
+    提供用户创建、管理博客帖子的接口文档。
+    此文档基于 `createPost` 接口生成，该接口允许指定用户创建一篇新的博客文章。
+  version: 1.0.0
+  contact:
+    name: API 支持
+    email: support@example.com
+
+servers:
+  - url: https://192.168.2.201:8083/posts
+
+
+paths:
+  /{userId}/create:
+    post:
+      summary: 为指定用户创建一篇新博客帖子
+      operationId: createPost
+      parameters:
+        - name: userId
+          in: path
+          description: 要为其创建帖子的用户的唯一标识符 (ID)。
+          required: true # 路径参数必须为 true
+          schema:
+            type: integer
+            format: int64 # 表示这是一个 64 位长整型
+            example: 1001
+      requestBody:
+        description: 创建帖子所需的 JSON 数据，必须包含帖子标题和内容。
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: # 必填字段列表
+                - title
+                - content
+              properties:
+                title:
+                  type: string
+                  description: 博客帖子的标题。
+                  example: "我的第一篇博客文章"
+                content:
+                  type: string
+                  description: 博客帖子的正文内容。
+                  example: "这是文章的详细内容，可以包含很多文字..."
+                tags:
+                  type: array
+                  description: (可选) 与帖子关联的标签列表。
+                  items:
+                    type: string
+                  example: ["技术", "生活", "Spring Boot"]
+            example:
+              title: "OpenAPI 3.0 最佳实践"
+              content: "本文档详细介绍了如何编写一份清晰、规范的 OpenAPI 3.0 文档..."
+              tags: ["API", "文档", "开发"]
+      responses:
+        '200':
+          description: 帖子创建成功。返回一个包含新帖子所有信息的 JSON 对象。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    description: 自定义的业务状态码，200 表示成功。
+                    example: 200
+                  message:
+                    type: string
+                    description: 操作结果的描述信息。
+                    example: "Success"
+                  data:
+                    type: object
+                    description: 返回的数据主体，包含新创建帖子的详细信息。
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        description: 系统为帖子生成的唯一 ID。
+                        example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                      title:
+                        type: string
+                        description: 帖子的标题。
+                        example: "OpenAPI 3.0 最佳实践"
+                      content:
+                        type: string
+                        description: 帖子的内容。
+                        example: "本文档详细介绍了如何编写一份清晰、规范的 OpenAPI 3.0 文档..."
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: 帖子的创建时间，遵循 ISO 8601 标准。
+                        example: "2025-09-23T10:00:00Z"
+                      viewCount:
+                        type: integer
+                        format: int32
+                        description: 帖子的浏览次数，初始为 0。
+                        example: 0
+                      likeCount:
+                        type: integer
+                        format: int32
+                        description: 帖子的点赞次数，初始为 0。
+                        example: 0
+                      commentCount:
+                        type: integer
+                        format: int32
+                        description: 帖子的评论数量，初始为 0。
+                        example: 0
+                      shareCount:
+                        type: integer
+                        format: int32
+                        description: 帖子的分享次数，初始为 0。
+                        example: 0
+              example:
+                code: 200
+                message: "Success"
+                data:
+                  id: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                  title: "OpenAPI 3.0 最佳实践"
+                  content: "本文档详细介绍了如何编写一份清晰、规范的 OpenAPI 3.0 文档..."
+                  createdAt: "2025-09-23T10:00:00Z"
+                  viewCount: 0
+                  likeCount: 0
+                  commentCount: 0
+                  shareCount: 0
+        '400':
+          description: 请求无效。例如，请求体 JSON 格式错误，或缺少必填字段（如 `title` 或 `content`）。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse' # 引用下面定义的通用错误响应模型
+        '500':
+          description: 服务器内部错误。例如，数据库连接失败或处理请求时发生未预期的异常。
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      description: 一个通用的 API 错误响应结构。
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: 错误的业务代码。
+          example: 400
+        message:
+          type: string
+          description: 人类可读的错误信息。
+          example: "Invalid request body: 'title' field is missing."
+      required:
+        - code
+        - message

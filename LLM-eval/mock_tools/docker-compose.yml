@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mocktool:
+    image: azul/zulu-openjdk:17-latest
+    container_name: mocktool
+    #restart: unless-stopped
+    ports:
+      - "8089:8081"
+    volumes:
+      - ./target/mocktool-0.0.1-SNAPSHOT.jar:/app/mocktool.jar
+      - ./logs:/app/logs
+    working_dir: /app
+    command: java -jar -Dspring.profiles.active=qc /app/mocktool.jar
+    environment:
+      - SPRING_PROFILES_ACTIVE=qc
+      - SERVER_PORT=8081
+      - TZ=Asia/Shanghai
+    networks:
+      - mocktool-network
+
+networks:
+  mocktool-network:
+    driver: bridge

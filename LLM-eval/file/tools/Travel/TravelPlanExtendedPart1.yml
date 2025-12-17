@@ -1,0 +1,114 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Extended API - Part 1
+  version: 1.0.0
+  description: 路线规划，涉及实时交通、公共交通、停车、出租车
+servers:
+  - url: 'http://192.168.2.201:8083/travel-plans-extended'
+paths:
+  '/{planId}/transport/route':
+    get:
+      summary: 获取路线规划
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: mode
+          in: query
+          required: false
+          schema:
+            type: string
+            default: driving
+      responses:
+        '200':
+          description: 路线规划结果
+  '/{planId}/transport/traffic':
+    get:
+      summary: 获取实时交通信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: location
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 实时交通信息
+  '/{planId}/transport/public':
+    get:
+      summary: 获取公共交通信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 公共交通选项
+  '/{planId}/transport/parking':
+    get:
+      summary: 获取停车信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: location
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 停车场信息列表
+  '/{planId}/transport/taxi':
+    get:
+      summary: 获取出租车信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 出租车信息

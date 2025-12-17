@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Final API-Part 4
+  version: 1.0.0
+  description: 紧急和安全相关，涵盖紧急联系方式、安全提醒、医疗信息、保险信息、安全建议
+servers:
+  - url: 'http://192.168.2.201:8083/travel-plans-final'
+paths:
+  '/{planId}/emergency/contacts':
+    get:
+      summary: 获取紧急联系方式
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取紧急联系方式
+        '400':
+          description: 无效计划ID
+  '/{planId}/safety/alerts':
+    get:
+      summary: 获取安全提醒
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取安全提醒
+        '400':
+          description: 无效计划ID
+  '/{planId}/medical/info':
+    get:
+      summary: 获取医疗信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取医疗信息
+        '400':
+          description: 无效计划ID
+  '/{planId}/insurance/info':
+    get:
+      summary: 获取保险信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取保险信息
+        '400':
+          description: 无效计划ID
+  '/{planId}/safety/recommendations':
+    get:
+      summary: 获取安全建议
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取安全建议
+        '400':
+          description: 无效计划ID

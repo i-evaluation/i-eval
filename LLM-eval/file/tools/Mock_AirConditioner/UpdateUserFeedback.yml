@@ -1,0 +1,79 @@
+openapi: 3.0.0
+info:
+  title: 设置空调设备的用户反馈
+  description: 设置空调设备的用户反馈
+  version: 1.0.0
+servers:
+  - url: http://192.168.2.201:8083
+paths:
+  /api/air-conditioner/set:
+    post:
+      summary: 设置空调设备信息
+      description: 设置空调设备的用户反馈和运行记录，返回包含大参数值的响应
+      operationId: setAirConditioner
+      tags:
+        - 空调设备管理
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feedback:
+                  type: string
+                  description: 用户反馈内容
+                  example: "空调运行良好，制冷效果满意"
+      responses:
+        '200':
+          description: 设置成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userFeedBack:
+                    type: string
+                    description: 用户反馈信息（1k大小的参数值）
+                    example: "空调性能监控数据：设备运行状态正常，温度控制精确，能耗表现优秀..."
+        '401':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: 错误状态码
+                    example: 401
+                  message:
+                    type: string
+                    description: 错误信息
+                    example: "请求参数不能为空"
+components:
+  schemas:
+    AirConditionerSetRequest:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          description: 设备ID
+        userId:
+          type: string
+          description: 用户ID
+        feedback:
+          type: string
+          description: 用户反馈内容
+        settings:
+          type: object
+          description: 设备设置参数
+    AirConditionerSetResponse:
+      type: object
+      properties:
+        userFeedBack:
+          type: string
+          description: 用户反馈信息
+        records:
+          type: string
+          description: 运行记录信息

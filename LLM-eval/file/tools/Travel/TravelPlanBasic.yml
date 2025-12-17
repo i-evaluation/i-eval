@@ -1,0 +1,312 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan API
+  version: 1.0.0
+  description: "可创建，更新、获取，删除旅游计划"
+servers:
+  - url: http://192.168.2.201:8083/travel-plans/basic
+
+paths:
+  /:
+    post:
+      summary: 创建旅游计划
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                destination:
+                  type: string
+                  example: "日本, 东京"
+                startDate:
+                  type: string
+                  format: date
+                  example: "2024-11-20"
+                endDate:
+                  type: string
+                  format: date
+                  example: "2024-11-27"
+                budget:
+                  type: number
+                  format: double
+                  example: 25000.0
+                travelers:
+                  type: integer
+                  example: 2
+                tripTheme:
+                  type: string
+                  example: "文化探索与美食之旅"
+                travelerAges:
+                  type: array
+                  items:
+                    type: integer
+                  example: [28, 30]
+                preferredAccommodationType:
+                  type: string
+                  example: "酒店"
+                accommodationStarRating:
+                  type: integer
+                  example: 4
+                preferredTransportation:
+                  type: string
+                  example: "新干线 + 地铁"
+                includeFlight:
+                  type: boolean
+                  example: true
+                departureAirport:
+                  type: string
+                  example: "PEK"
+                flightClass:
+                  type: string
+                  example: "经济舱"
+                dailyBudgetPerPerson:
+                  type: number
+                  format: double
+                  example: 800.0
+                mustVisitAttractions:
+                  type: array
+                  items:
+                    type: string
+                  example: ["浅草寺", "东京塔", "涩谷十字路口"]
+                preferredActivities:
+                  type: array
+                  items:
+                    type: string
+                  example: ["参观博物馆", "品尝当地美食", "购物"]
+                foodPreferences:
+                  type: array
+                  items:
+                    type: string
+                  example: ["日式料理", "拉面", "海鲜"]
+                dietaryRestrictions:
+                  type: string
+                  example: "无"
+                travelPace:
+                  type: string
+                  example: "适中"
+                includeGuide:
+                  type: boolean
+                  example: false
+                languagePreference:
+                  type: string
+                  example: "中文"
+                specialRequests:
+                  type: string
+                  example: "希望安排一天自由活动"
+                emergencyContactName:
+                  type: string
+                  example: "张三"
+                emergencyContactPhone:
+                  type: string
+                  example: "+86 138 0013 8000"
+                travelInsurance:
+                  type: boolean
+                  example: true
+                isFlexibleWithDates:
+                  type: boolean
+                  example: true
+                flexibleDateRange:
+                  type: integer
+                  example: 3
+                currency:
+                  type: string
+                  example: "CNY"
+                userId:
+                  type: string
+                  example: "user12345"
+                notes:
+                  type: string
+                  example: "这是我们第一次去日本，希望行程不要太赶。"
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 201
+                  planId:
+                    type: string
+                    example: "12345678"
+                  destination:
+                    type: string
+                  startDate:
+                    type: string
+                  endDate:
+                    type: string
+                  budget:
+                    type: number
+                  travelers:
+                    type: integer
+                  tripTheme:
+                    type: string
+                  travelerAges:
+                    type: array
+                    items:
+                      type: integer
+                  createdAt:
+                    type: string
+                    format: date-time
+
+  /{planId}:
+    get:
+      summary: 获取旅游计划详情
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  planId:
+                    type: integer
+                  destination:
+                    type: string
+                  startDate:
+                    type: string
+                  endDate:
+                    type: string
+                  budget:
+                    type: number
+                  travelers:
+                    type: integer
+                  status:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+    put:
+      summary: 更新旅游计划
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                destination:
+                  type: string
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                budget:
+                  type: number
+                travelers:
+                  type: integer
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  planId:
+                    type: integer
+                  updatedAt:
+                    type: string
+                    format: date-time
+    delete:
+      summary: 删除旅游计划
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+                  planId:
+                    type: integer
+                  deletedAt:
+                    type: string
+                    format: date-time
+
+  /{planId}/activities:
+    post:
+      summary: 添加旅游活动
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                activityName:
+                  type: string
+                  example: "参观博物馆"
+                activityDate:
+                  type: string
+                  format: date
+                  example: "2023-07-10"
+                activityTime:
+                  type: string
+                  example: "10:00"
+                location:
+                  type: string
+                  example: "博物馆"
+                description:
+                  type: string
+                  example: "参观著名博物馆"
+                cost:
+                  type: number
+                  example: 50.0
+      responses:
+        '201':
+          description: 添加成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  activityId:
+                    type: string
+                  planId:
+                    type: integer
+                  createdAt:
+                    type: string

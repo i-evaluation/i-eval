@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration  scan="true" scanPeriod="60 seconds" debug="false">
+    <contextName>i-eval</contextName>
+    <property name="log.path" value="logs" />
+    <property name="projectName" value="LLM-eval" />
+    <!--输出到控制台-->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+       <!-- <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>-->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} %method - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--输出到文件-->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+       <file>${log.path}/${projectName}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>${log.path}/${projectName}.%d{yyyy-MM-dd}.log</fileNamePattern>
+        <maxHistory>30</maxHistory>
+        <totalSizeCap>50MB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+        <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} %method - %msg%n</pattern>
+    </encoder>
+</appender>
+
+    <root level="info">
+        <appender-ref ref="console" />
+        <!--<appender-ref ref="file" />-->
+    </root>
+
+    <!-- logback为java中的包 -->
+    <logger name="com.litevar.ieval" level="info" additivity="true">
+         <appender-ref ref="file"/>
+    </logger>
+</configuration>

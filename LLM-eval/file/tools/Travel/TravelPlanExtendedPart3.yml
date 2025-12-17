@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Extended API - Part 3
+  version: 1.0.0
+  description: 交通规划，涉及轮渡、交通费用估算、交通时间估算、拥堵预测、交通替代方案
+servers:
+  - url: 'http://192.168.2.201:8083/travel-plans-extended'
+paths:
+  '/{planId}/transport/ferry':
+    get:
+      summary: 获取轮渡信息
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 轮渡信息
+  '/{planId}/transport/cost-estimate':
+    get:
+      summary: 获取交通费用估算
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: mode
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 交通费用估算
+  '/{planId}/transport/time-estimate':
+    get:
+      summary: 获取交通时间估算
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: mode
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 交通时间估算
+  '/{planId}/transport/congestion-forecast':
+    get:
+      summary: 获取交通拥堵预测
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: route
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: time
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 交通拥堵预测
+  '/{planId}/transport/alternatives':
+    get:
+      summary: 获取交通替代方案
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 交通替代方案

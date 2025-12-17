@@ -1,0 +1,78 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Final API-Part 3
+  version: 1.0.0
+  description: 分析和统计相关，涵盖费用分析、行程统计，用户行为分析、满意度调查、综合报告、
+servers:
+  - url: 'http://192.168.2.201:8083/travel-plans-final'
+paths:
+  '/{planId}/analytics/expenses':
+    get:
+      summary: 获取费用分析
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取费用分析
+        '400':
+          description: 无效计划ID
+  '/{planId}/analytics/itinerary':
+    get:
+      summary: 获取行程统计
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取行程统计
+        '400':
+          description: 无效计划ID
+  '/{planId}/analytics/behavior':
+    get:
+      summary: 获取用户行为分析
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取用户行为分析
+        '400':
+          description: 无效计划ID
+  '/{planId}/analytics/satisfaction':
+    get:
+      summary: 获取满意度调查
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取满意度调查
+        '400':
+          description: 无效计划ID
+  '/{planId}/analytics/comprehensive-report':
+    get:
+      summary: 获取综合报告
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取综合报告
+        '400':
+          description: 无效计划ID

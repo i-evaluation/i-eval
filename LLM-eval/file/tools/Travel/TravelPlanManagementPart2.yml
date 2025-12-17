@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Travel Plan Management API-Part 2
+  version: 1.0.0
+  description: 旅游计划管理，涵盖计算旅游预算、生成旅游行程、分享/取消旅游计划、获取旅游计划分享链接
+servers:
+  - url: 'http://192.168.2.201:8083/travel-plans/management'
+paths:
+  '/{planId}/budget/calculate':
+    get:
+      summary: 计算旅游预算
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功计算预算
+        '400':
+          description: 无效的计划ID
+  '/{planId}/itinerary/generate':
+    get:
+      summary: 生成旅游行程
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功生成行程
+        '400':
+          description: 无效的计划ID
+  '/{planId}/share':
+    post:
+      summary: 分享旅游计划
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                shareType:
+                  type: string
+                recipients:
+                  type: array
+                  items:
+                    type: string
+                isPublic:
+                  type: boolean
+      responses:
+        '200':
+          description: 成功分享计划
+        '400':
+          description: 参数错误
+  '/{planId}/share/{shareId}':
+    get:
+      summary: 获取分享链接
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: shareId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功获取分享链接
+        '400':
+          description: 无效的计划ID或分享ID
+    delete:
+      summary: 取消分享
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: shareId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 分享已取消
+        '400':
+          description: 无效的计划ID或分享ID

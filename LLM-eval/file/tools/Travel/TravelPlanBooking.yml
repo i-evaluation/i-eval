@@ -1,0 +1,1019 @@
+openapi: 3.0.0
+info:
+  title: 旅行计划预订 API
+  description: 旅行计划预订相关的接口文档，包括酒店、航班、租车和门票的预订、查询和取消功能。
+  version: 1.0.0
+servers:
+  - url: http://192.168.2.35:8081/travel-plans/booking
+
+paths:
+  # 酒店预订相关接口
+  /{planId}/hotels:
+    post:
+      tags:
+        - 酒店预订
+      summary: 预订酒店
+      description: 为指定的旅行计划预订酒店
+      operationId: bookHotel
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: 旅行计划ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - hotelName
+                - checkInDate
+              properties:
+                hotelName:
+                  type: string
+                  description: 酒店名称
+                hotelAddress:
+                  type: string
+                  description: 酒店地址
+                checkInDate:
+                  type: string
+                  format: date
+                  description: 入住日期
+                checkOutDate:
+                  type: string
+                  format: date
+                  description: 退房日期
+                roomType:
+                  type: string
+                  description: 房间类型
+                guests:
+                  type: integer
+                  description: 客人数量
+                totalPrice:
+                  type: number
+                  format: double
+                  description: 总价格
+      responses:
+        '201':
+          description: 酒店预订成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 201
+                  bookingId:
+                    type: string
+                    description: 预订ID
+                  planId:
+                    type: integer
+                    format: int64
+                    description: 旅行计划ID
+                  hotelName:
+                    type: string
+                    description: 酒店名称
+                  hotelAddress:
+                    type: string
+                    description: 酒店地址
+                  checkInDate:
+                    type: string
+                    format: date
+                    description: 入住日期
+                  checkOutDate:
+                    type: string
+                    format: date
+                    description: 退房日期
+                  roomType:
+                    type: string
+                    description: 房间类型
+                  guests:
+                    type: integer
+                    description: 客人数量
+                  totalPrice:
+                    type: number
+                    format: double
+                    description: 总价格
+                  status:
+                    type: string
+                    example: confirmed
+                  bookedAt:
+                    type: string
+                    format: date-time
+                    description: 预订时间
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message:
+                    type: string
+                    description: 错误信息
+
+    get:
+      tags:
+        - 酒店预订
+      summary: 获取酒店预订列表
+      description: 获取指定旅行计划的所有酒店预订
+      operationId: getHotelBookings
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: 旅行计划ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功获取酒店预订列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HotelBooking'
+                  planId:
+                    type: integer
+                    format: int64
+                    description: 旅行计划ID
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message:
+                    type: string
+                    description: 错误信息
+
+  /{planId}/hotels/cancel:
+    post:
+      tags:
+        - 酒店预订
+      summary: 取消酒店预订
+      description: 取消指定的酒店预订
+      operationId: cancelHotelBooking
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: 旅行计划ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - bookingId
+              properties:
+                bookingId:
+                  type: string
+                  description: 预订ID
+      responses:
+        '200':
+          description: 酒店预订取消成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  message:
+                    type: string
+                    example: 酒店预订已取消
+                  bookingId:
+                    type: string
+                    description: 预订ID
+                  planId:
+                    type: integer
+                    format: int64
+                    description: 旅行计划ID
+                  cancelledAt:
+                    type: string
+                    format: date-time
+                    description: 取消时间
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message:
+                    type: string
+                    description: 错误信息
+
+  # 航班预订相关接口
+  /{planId}/flights:
+    post:
+      tags:
+        - 航班预订
+      summary: 预订航班
+      description: 为指定的旅行计划预订航班
+      operationId: bookFlight
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: 旅行计划ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - flightNumber
+                - departureDate
+              properties:
+                flightNumber:
+                  type: string
+                  description: 航班号
+                airline:
+                  type: string
+                  description: 航空公司
+                departureAirport:
+                  type: string
+                  description: 出发机场
+                arrivalAirport:
+                  type: string
+                  description: 到达机场
+                departureDate:
+                  type: string
+                  format: date
+                  description: 出发日期
+                arrivalDate:
+                  type: string
+                  format: date
+                  description: 到达日期
+                departureTime:
+                  type: string
+                  format: time
+                  description: 出发时间
+                arrivalTime:
+                  type: string
+                  format: time
+                  description: 到达时间
+                passengers:
+                  type: integer
+                  description: 乘客数量
+                totalPrice:
+                  type: number
+                  format: double
+                  description: 总价格
+      responses:
+        '201':
+          description: 航班预订成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 201
+                  bookingId:
+                    type: string
+                    description: 预订ID
+                  planId:
+                    type: integer
+                    format: int64
+                    description: 旅行计划ID
+                  flightNumber:
+                    type: string
+                    description: 航班号
+                  airline:
+                    type: string
+                    description: 航空公司
+                  departureAirport:
+                    type: string
+                    description: 出发机场
+                  arrivalAirport:
+                    type: string
+                    description: 到达机场
+                  departureDate:
+                    type: string
+                    format: date
+                    description: 出发日期
+                  arrivalDate:
+                    type: string
+                    format: date
+                    description: 到达日期
+                  departureTime:
+                    type: string
+                    format: time
+                    description: 出发时间
+                  arrivalTime:
+                    type: string
+                    format: time
+                    description: 到达时间
+                  passengers:
+                    type: integer
+                    description: 乘客数量
+                  totalPrice:
+                    type: number
+                    format: double
+                    description: 总价格
+                  status:
+                    type: string
+                    example: confirmed
+                  bookedAt:
+                    type: string
+                    format: date-time
+                    description: 预订时间
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message:
+                    type: string
+                    description: 错误信息
+
+    get:
+      tags:
+        - 航班预订
+      summary: 获取航班预订列表
+      description: 获取指定旅行计划的所有航班预订
+      operationId: getFlightBookings
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: 旅行计划ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功获取航班预订列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FlightBooking'
+                  planId:
+                    type: integer
+                    format: int64
+                    description: 旅行计划ID
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message:
+                    type: string
+                    description: 错误信息
+
+  /{planId}/flights/cancel:
+    post:
+      tags:
+        - 航班预订
+      summary: 取消航班预订
+      description: 取消指定的航班预订
+      operationId: cancelFlightBooking
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: 旅行计划ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - bookingId
+              properties:
+                bookingId:
+                  type: string
+                  description: 预订ID
+      responses:
+        '200':
+          description: 航班预订取消成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  message:
+                    type: string
+                    example: 航班预订已取消
+                  bookingId:
+                    type: string
+                    description: 预订ID
+                  planId:
+                    type: integer
+                    format: int64
+                    description: 旅行计划ID
+                  cancelledAt:
+                    type: string
+                    format: date-time
+                    description: 取消时间
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message:
+                    type: string
+                    description: 错误信息
+
+  # 租车预订相关接口
+  /{planId}/cars:
+    post:
+      tags:
+        - 租车预订
+      summary: 预订租车
+      description: 为指定的旅行计划预订租车
+      operationId: bookCar
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: 旅行计划ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - carModel
+                - pickupDate
+              properties:
+                carModel:
+                  type: string
+                  description: 车型
+                carType:
+                  type: string
+                  description: 车辆类型
+                pickupLocation:
+                  type: string
+                  description: 取车地点
+                returnLocation:
+                  type: string
+                  description: 还车地点
+                pickupDate:
+                  type: string
+                  format: date
+                  description: 取车日期
+                returnDate:
+                  type: string
+                  format: date
+                  description: 还车日期
+                pickupTime:
+                  type: string
+                  format: time
+                  description: 取车时间
+                returnTime:
+                  type: string
+                  format: time
+                  description: 还车时间
+                rentalDays:
+                  type: integer
+                  description: 租赁天数
+                totalPrice:
+                  type: number
+                  format: double
+                  description: 总价格
+      responses:
+        '201':
+          description: 租车预订成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 201
+                  bookingId:
+                    type: string
+                    description: 预订ID
+                  planId:
+                    type: integer
+                    format: int64
+                    description: 旅行计划ID
+                  carModel:
+                    type: string
+                    description: 车型
+                  carType:
+                    type: string
+                    description: 车辆类型
+                  pickupLocation:
+                    type: string
+                    description: 取车地点
+                  returnLocation:
+                    type: string
+                    description: 还车地点
+                  pickupDate:
+                    type: string
+                    format: date
+                    description: 取车日期
+                  returnDate:
+                    type: string
+                    format: date
+                    description: 还车日期
+                  pickupTime:
+                    type: string
+                    format: time
+                    description: 取车时间
+                  returnTime:
+                    type: string
+                    format: time
+                    description: 还车时间
+                  rentalDays:
+                    type: integer
+                    description: 租赁天数
+                  totalPrice:
+                    type: number
+                    format: double
+                    description: 总价格
+                  status:
+                    type: string
+                    example: confirmed
+                  bookedAt:
+                    type: string
+                    format: date-time
+                    description: 预订时间
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message:
+                    type: string
+                    description: 错误信息
+
+    get:
+      tags:
+        - 租车预订
+      summary: 获取租车预订列表
+      description: 获取指定旅行计划的所有租车预订
+      operationId: getCarBookings
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: 旅行计划ID
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: 成功获取租车预订列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CarBooking'
+                  planId:
+                    type: integer
+                    format: int64
+                    description: 旅行计划ID
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message:
+                    type: string
+                    description: 错误信息
+
+  /{planId}/cars/cancel:
+    post:
+      tags:
+        - 租车预订
+      summary: 取消租车预订
+      description: 取消指定的租车预订
+      operationId: cancelCarBooking
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: 旅行计划ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - bookingId
+              properties:
+                bookingId:
+                  type: string
+                  description: 预订ID
+      responses:
+        '200':
+          description: 租车预订取消成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  message:
+                    type: string
+                    example: 租车预订已取消
+                  bookingId:
+                    type: string
+                    description: 预订ID
+                  planId:
+                    type: integer
+                    format: int64
+                    description: 旅行计划ID
+                  cancelledAt:
+                    type: string
+                    format: date-time
+                    description: 取消时间
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message:
+                    type: string
+                    description: 错误信息
+
+  # 门票预订相关接口
+  /{planId}/tickets:
+    post:
+      tags:
+        - 门票预订
+      summary: 预订门票
+      description: 为指定的旅行计划预订门票
+      operationId: bookTicket
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          description: 旅行计划ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - attractionName
+                - visitDate
+              properties:
+                attractionName:
+                  type: string
+                  description: 景点名称
+                attractionAddress:
+                  type: string
+                  description: 景点地址
+                visitDate:
+                  type: string
+                  format: date
+                  description: 参观日期
+                visitTime:
+                  type: string
+                  format: time
+                  description: 参观时间
+                ticketType:
+                  type: string
+                  description: 门票类型
+                quantity:
+                  type: integer
+                  description: 门票数量
+                unitPrice:
+                  type: number
+                  format: double
+                  description: 单价
+                totalPrice:
+                  type: number
+                  format: double
+                  description: 总价格
+      responses:
+        '201':
+          description: 门票预订成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 201
+                  bookingId:
+                    type: string
+                    description: 预订ID
+                  planId:
+                    type: integer
+                    format: int64
+                    description: 旅行计划ID
+                  attractionName:
+                    type: string
+                    description: 景点名称
+                  attractionAddress:
+                    type: string
+                    description: 景点地址
+                  visitDate:
+                    type: string
+                    format: date
+                    description: 参观日期
+                  visitTime:
+                    type: string
+                    format: time
+                    description: 参观时间
+                  ticketType:
+                    type: string
+                    description: 门票类型
+                  quantity:
+                    type: integer
+                    description: 门票数量
+                  unitPrice:
+                    type: number
+                    format: double
+                    description: 单价
+                  totalPrice:
+                    type: number
+                    format: double
+                    description: 总价格
+                  status:
+                    type: string
+                    example: confirmed
+                  bookedAt:
+                    type: string
+                    format: date-time
+                    description: 预订时间
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 400
+                  message:
+                    type: string
+                    description: 错误信息
+
+components:
+  schemas:
+    HotelBooking:
+      type: object
+      properties:
+        bookingId:
+          type: string
+          description: 预订ID
+        planId:
+          type: integer
+          format: int64
+          description: 旅行计划ID
+        hotelName:
+          type: string
+          description: 酒店名称
+        hotelAddress:
+          type: string
+          description: 酒店地址
+        checkInDate:
+          type: string
+          format: date
+          description: 入住日期
+        checkOutDate:
+          type: string
+          format: date
+          description: 退房日期
+        roomType:
+          type: string
+          description: 房间类型
+        guests:
+          type: integer
+          description: 客人数量
+        totalPrice:
+          type: number
+          format: double
+          description: 总价格
+        status:
+          type: string
+          example: confirmed
+
+    FlightBooking:
+      type: object
+      properties:
+        bookingId:
+          type: string
+          description: 预订ID
+        planId:
+          type: integer
+          format: int64
+          description: 旅行计划ID
+        flightNumber:
+          type: string
+          description: 航班号
+        airline:
+          type: string
+          description: 航空公司
+        departureAirport:
+          type: string
+          description: 出发机场
+        arrivalAirport:
+          type: string
+          description: 到达机场
+        departureDate:
+          type: string
+          format: date
+          description: 出发日期
+        arrivalDate:
+          type: string
+          format: date
+          description: 到达日期
+        departureTime:
+          type: string
+          format: time
+          description: 出发时间
+        arrivalTime:
+          type: string
+          format: time
+          description: 到达时间
+        passengers:
+          type: integer
+          description: 乘客数量
+        totalPrice:
+          type: number
+          format: double
+          description: 总价格
+        status:
+          type: string
+          example: confirmed
+
+    CarBooking:
+      type: object
+      properties:
+        bookingId:
+          type: string
+          description: 预订ID
+        planId:
+          type: integer
+          format: int64
+          description: 旅行计划ID
+        carModel:
+          type: string
+          description: 车型
+        carType:
+          type: string
+          description: 车辆类型
+        pickupLocation:
+          type: string
+          description: 取车地点
+        returnLocation:
+          type: string
+          description: 还车地点
+        pickupDate:
+          type: string
+          format: date
+          description: 取车日期
+        returnDate:
+          type: string
+          format: date
+          description: 还车日期
+        pickupTime:
+          type: string
+          format: time
+          description: 取车时间
+        returnTime:
+          type: string
+          format: time
+          description: 还车时间
+        rentalDays:
+          type: integer
+          description: 租赁天数
+        totalPrice:
+          type: number
+          format: double
+          description: 总价格
+        status:
+          type: string
+          example: confirmed
+
+tags:
+  - name: 酒店预订
+    description: 酒店预订相关接口
+  - name: 航班预订
+    description: 航班预订相关接口
+  - name: 租车预订
+    description: 租车预订相关接口
+  - name: 门票预订
+    description: 门票预订相关接口
