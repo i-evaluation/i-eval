@@ -79,51 +79,56 @@ public class OpenAiClient extends LlmHttpClient {
         JSONArray wrongArgFunctionCalls = new JSONArray();
         JSONArray originalFunctions = new JSONArray();
         JSONArray funcArray = msgObject.getJSONArray("tool_calls");
-        for(int i=0; i<funcArray.size(); i++) {
-            JSONObject tmpObject = funcArray.getJSONObject(i);
-            JSONObject tmpFunObj = tmpObject.getJSONObject("function");
-            if(StringUtils.isNoneBlank(tmpFunObj.getString("name"))) {
-                originalFunctions.add(tmpFunObj.getString("name"));
-                JSONObject arguments = null;
-                boolean argsIsValid = true;
-                if(tmpFunObj.containsKey("arguments") && tmpFunObj.get("arguments")!=null) {
-                    if(tmpFunObj.get("arguments") instanceof String) {
-                        String args = tmpFunObj.getString("arguments");
-                        JSONObject tmpArgumentObj = parseStringArgs(args, tmpFunObj);
-                        if(tmpArgumentObj!=null && !tmpArgumentObj.containsKey("jsonExceptionLV")) {
-                            arguments = tmpArgumentObj;
+        try{
+            for(int i=0; i<funcArray.size(); i++) {
+                JSONObject tmpObject = funcArray.getJSONObject(i);
+                JSONObject tmpFunObj = tmpObject.getJSONObject("function");
+                if(StringUtils.isNoneBlank(tmpFunObj.getString("name"))) {
+                    originalFunctions.add(tmpFunObj.getString("name"));
+                    JSONObject arguments = null;
+                    boolean argsIsValid = true;
+                    if(tmpFunObj.containsKey("arguments") && tmpFunObj.get("arguments")!=null) {
+                        if(tmpFunObj.get("arguments") instanceof String) {
+                            String args = tmpFunObj.getString("arguments");
+                            JSONObject tmpArgumentObj = parseStringArgs(args, tmpFunObj);
+                            if(tmpArgumentObj!=null && !tmpArgumentObj.containsKey("jsonExceptionLV")) {
+                                arguments = tmpArgumentObj;
+                            }
+                            else {
+                                argsIsValid = false;
+                                if(tmpArgumentObj!=null && tmpArgumentObj.containsKey("jsonExceptionLV")) {
+                                    JSONObject wrongArgFunctionCall = new JSONObject();
+                                    wrongArgFunctionCall.put("name", tmpFunObj.getString("name"));
+                                    wrongArgFunctionCall.put("arguments", args);
+                                    wrongArgFunctionCall.put("exception", tmpArgumentObj.getString("jsonExceptionLV"));
+                                    wrongArgFunctionCalls.add(wrongArgFunctionCall);
+                                }
+                            }
+                        }
+                        else if(tmpFunObj.get("arguments") instanceof JSONObject) {
+                            arguments = tmpFunObj.getJSONObject("arguments");
                         }
                         else {
                             argsIsValid = false;
-                            if(tmpArgumentObj!=null && tmpArgumentObj.containsKey("jsonExceptionLV")) {
-                                JSONObject wrongArgFunctionCall = new JSONObject();
-                                wrongArgFunctionCall.put("name", tmpFunObj.getString("name"));
-                                wrongArgFunctionCall.put("arguments", args);
-                                wrongArgFunctionCall.put("exception", tmpArgumentObj.getString("jsonExceptionLV"));
-                                wrongArgFunctionCalls.add(wrongArgFunctionCall);
-                            }
+                            logger.error("invalid arguments object: {}", tmpFunObj.get("arguments"));
+                            JSONObject wrongArgFunctionCall = new JSONObject();
+                            wrongArgFunctionCall.put("name", tmpFunObj.getString("name"));
+                            wrongArgFunctionCall.put("arguments", tmpFunObj.get("arguments"));
+                            wrongArgFunctionCall.put("exception", "未知的数据类型");
+                            wrongArgFunctionCalls.add(wrongArgFunctionCall);
                         }
                     }
-                    else if(tmpFunObj.get("arguments") instanceof JSONObject) {
-                        arguments = tmpFunObj.getJSONObject("arguments");
+                    if(argsIsValid) {
+                        functionCalls.add(new FunctionCall(tmpObject, tmpObject.getString("id"), tmpFunObj.getString("name"), arguments));
                     }
                     else {
-                        argsIsValid = false;
-                        logger.error("invalid arguments object: {}", tmpFunObj.get("arguments"));
-                        JSONObject wrongArgFunctionCall = new JSONObject();
-                        wrongArgFunctionCall.put("name", tmpFunObj.getString("name"));
-                        wrongArgFunctionCall.put("arguments", tmpFunObj.get("arguments"));
-                        wrongArgFunctionCall.put("exception", "未知的数据类型");
-                        wrongArgFunctionCalls.add(wrongArgFunctionCall);
+                        logger.error("method: {} with invalid arguments: {}", tmpFunObj.getString("name"), tmpFunObj.get("arguments"));
                     }
                 }
-                if(argsIsValid) {
-                    functionCalls.add(new FunctionCall(tmpObject, tmpObject.getString("id"), tmpFunObj.getString("name"), arguments));
-                }
-                else {
-                    logger.error("method: {} with invalid arguments: {}", tmpFunObj.getString("name"), tmpFunObj.get("arguments"));
-                }
             }
+        }
+        catch (Exception e) {
+            logger.error("getToolCalls error: ", e);
         }
         toolCalls.setOriginalFunctions(originalFunctions);
         if(!functionCalls.isEmpty()) {
@@ -213,7 +218,9 @@ public class OpenAiClient extends LlmHttpClient {
         if("json_object".equals(options.getResponseFormat())) {
             sendPayloadObj.put("response_format", JSONObject.parseObject("{\"type\": \"json_object\"}"));
         }
-        JSONObject result = RestUtil.postWithHeader(config.getEndpoint()+"/v1/chat/completions", headers, sendPayloadObj.toJSONString());
+        String url = "/v1/chat/completions";
+        if(config.getModel().startsWith("glm-")) url = "/api/paas/v4/chat/completions";
+        JSONObject result = RestUtil.postWithHeader(config.getEndpoint()+url, headers, sendPayloadObj.toJSONString());
         logger.info("receive>>> {}", result);
         return result;
     }

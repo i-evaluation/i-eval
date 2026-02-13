@@ -7,17 +7,17 @@ package com.litevar.ieval.llm.runner;
 public class TestCaseOutput {
     private int rowNum;
     private String score;
-    //总持续时长
+    //Total duration
     private long duration;
-    //平均首次token时间
+    //Average first token time
     private long firstToken;
-    //平均每秒token数
+    //Average tokens per second
     private double tokenPerSecond;
-    //生成的总token数
+    //Total generated tokens
     private int completionTokens;
-    //上下文长度
+    //Context length
     private int promptTokens;
-    //上下文大小
+    //Context entries
     private int contextSize;
     private String details;
     public TestCaseOutput(int rowNum) {

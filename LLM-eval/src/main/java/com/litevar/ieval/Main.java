@@ -6,7 +6,7 @@ import com.litevar.ieval.llm.runner.SuiteRunner;
 // 点击装订区域中的 <icon src="AllIcons.Actions.Execute"/> 图标。
 public class Main {
     public static void main(String[] args) {
-        String testPlanPath = "file/testPlan.xlsx";
-        new SuiteRunner().run(testPlanPath);
+        String testPlanPath = "file/testPlan-local.xlsx";
+        new SuiteRunner().run(testPlanPath, "qwen3-omni-30b", true);
     }
 }

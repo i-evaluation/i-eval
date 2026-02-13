@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: 高级旅游计划接口，涵盖景点推荐、活动推荐、门票和导览预订等功能
 servers:
-  - url: http://192.168.2.201:8083/travel-plans-advanced
+  - url: http://192.168.2.201:8089/travel-plans-advanced
 paths:
   /{planId}/attractions/recommendations:
     get:

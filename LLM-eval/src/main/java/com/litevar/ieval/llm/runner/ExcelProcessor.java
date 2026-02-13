@@ -21,21 +21,21 @@ import java.util.*;
  **/
 public class ExcelProcessor {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final String[] cnHeaders1 = {"序号", "类别", "并发数", "提示词", "工具", "大模型", "用例集", "总结", "执行时间", "结果"};
+    private final String[] cnHeaders1 = {"序号", "类别", "并发数", "提示词", "工具", "大模型", "用例集", "描述", "总结", "执行时间", "结果"};
     private final String[] cnHeaders2 = {"序号", "指令", "图片", "期望", "得分", "时长(总)", "首token(平均)", "token每秒(平均)", "生成token数(总)", "上下文长度", "上下文条数", "详情"};
-    private final String[] enHeaders1 = {"No.", "Category", "Concurrency", "Prompt", "Tools", "LLM", "Test Suite", "Summary", "Execution Time", "Result"};
+    private final String[] enHeaders1 = {"No.", "Category", "Concurrency", "Prompt", "Tools", "LLM", "Test Suite", "Description", "Summary", "Execution Time", "Result"};
     private final String[] enHeaders2 = {"No.", "Instruction", "Image", "Expectation", "Score", "Duration(Total)", "First Token(Average)", "Tokens Per Second(Average)", "Generated Tokens(Total)", "Context Length", "Context Entries", "Details"};
 
     /**
-     * 处理Excel文件，读取序号、类别、提示词、工具、大模型、用例集六列，
-     * @param filePath Excel文件路径
+     * Process Excel files, read 8 columns: serial number, category, concurrency, prompt, tools, large model, test suite, description,
+     * @param filePath Excel file path
      */
     public List<TestSuiteInput> readTestPlan(String filePath) {
         try {
             FileInputStream fis = new FileInputStream(new File(filePath));
             Workbook workbook = new XSSFWorkbook(fis);
-            Sheet sheet = workbook.getSheetAt(0); // 获取第一个工作表
-            logger.info("套件总行数: {}", sheet.getLastRowNum());
+            Sheet sheet = workbook.getSheetAt(0);
+            logger.info("Total suite rows: {}", sheet.getLastRowNum());
             int headerType = checkHeader(sheet.getRow(0));
             if(headerType == 1) {
                 List<TestSuiteInput> testSuites = new ArrayList<>();
@@ -51,42 +51,45 @@ public class ExcelProcessor {
                     String tools = getStringCellValue(row, 4);
                     String model = getStringCellValue(row, 5);
                     String suite = getStringCellValue(row, 6);
+                    String description = getStringCellValue(row, 7);
                     if(StringUtils.isNoneBlank(prompt) && StringUtils.isNoneBlank(model) && StringUtils.isNoneBlank(suite)) {
-                        testSuites.add(new TestSuiteInput(row.getRowNum(), serial, category, concurrency, prompt, tools, model, suite));
+                        testSuites.add(new TestSuiteInput(row.getRowNum(), serial, category, concurrency, prompt, tools, model, suite, description));
                     }
                     else {
-                        logger.warn("文件: {}, 行: {}, 的提示词,大模型或用例集字段不能为空，跳过", filePath, i);
+                        logger.warn("File: {}, Row: {}, Prompt, Large Model or Test Suite fields cannot be empty, skipping", filePath, i);
                     }
                 }
                 return testSuites;
             }
             else {
-                logger.warn("文件: {}, 的标题行不符合要求(第一行必须为'序号、类别、并发数、提示词、工具、大模型、用例集、总结、执行时间、结果'10列)，请检查", filePath);
+                logger.warn("File: {}, Header row does not meet requirements (first row must be 'No.,Category,Concurrency,Prompt,Tools,LLM,Test Suite,Description,Summary,Execution Time,Result' 11 columns), please check", filePath);
             }
+            workbook.close();
+            fis.close();
         } catch (Exception e) {
             logger.error("unknownException: ", e);
         }
         return null;
     }
-    //测试计划：将结果写入总结和执行时间两列
+    //Test plan: Write results to Summary, Execution Time, and Result columns
     public void writeSummaryToTestPlan(String filePath, TestSuiteOutput testSuite) {
         if(StringUtils.isNoneBlank(testSuite.getSummary()) && StringUtils.isNoneBlank(testSuite.getExecuteTime())) {
             try {
                 FileInputStream fis = new FileInputStream(new File(filePath));
                 Workbook workbook = new XSSFWorkbook(fis);
-                Sheet sheet = workbook.getSheetAt(0); // 获取第一个工作表
+                Sheet sheet = workbook.getSheetAt(0);
                 int headerType = checkHeader(sheet.getRow(0));
                 if(headerType == 1) {
                     Row row = sheet.getRow(testSuite.getRowNum());
-                    // 写入总结和执行时间列
-                    Cell summaryCell = row.createCell(7);
+                    //write Summary, Execution Time
+                    Cell summaryCell = row.createCell(8);
                     summaryCell.setCellValue(testSuite.getSummary());
 
-                    Cell executionTimeCell = row.createCell(8);
+                    Cell executionTimeCell = row.createCell(9);
                     executionTimeCell.setCellValue(testSuite.getExecuteTime());
                     if(StringUtils.isNoneBlank(testSuite.getExecuteResult())) {
-                        //写入 文件
-                        Cell resultCell = row.createCell(9);
+                        //write result(testcases result file)
+                        Cell resultCell = row.createCell(10);
                         resultCell.setCellValue(testSuite.getExecuteResult());
                     }
                     FileOutputStream fos = new FileOutputStream(new File(filePath));
@@ -94,7 +97,7 @@ public class ExcelProcessor {
                     fos.close();
                 }
                 else {
-                    logger.warn("文件: {}, 的标题行不符合要求(第一行必须为'序号、类别、并发数、提示词、工具、大模型、用例集、总结、执行时间、结果'十列)，请检查", filePath);
+                    logger.warn("File: {}, Header row does not meet requirements (first row must be 'No.,Category,Concurrency,Prompt,Tools,LLM,Test Suite,Description,Summary,Execution Time,Result' 11 columns)", filePath);
                 }
                 workbook.close();
                 fis.close();
@@ -104,15 +107,15 @@ public class ExcelProcessor {
         }
     }
     /**
-     * 处理Excel文件，读取序号、指令、期望三列，
-     * @param filePath Excel文件路径
+     * Process Excel files, read three columns: serial number, instruction, expectation,
+     * @param filePath Excel file path
      */
     public Map<Integer, TestCaseInput> readTestSuite(String filePath) {
         try {
             FileInputStream fis = new FileInputStream(new File(filePath));
             Workbook workbook = new XSSFWorkbook(fis);
-            Sheet sheet = workbook.getSheetAt(0); // 获取第一个工作表
-            logger.info("用例总行数: {}", sheet.getLastRowNum());
+            Sheet sheet = workbook.getSheetAt(0);
+            logger.info("Total case rows: {}", sheet.getLastRowNum());
             int headerType = checkHeader(sheet.getRow(0));
             if(headerType == 2) {
                 Map<Integer, TestCaseInput> testCases = new HashMap<>();
@@ -129,32 +132,33 @@ public class ExcelProcessor {
                         testCases.put(row.getRowNum(), new TestCaseInput(row.getRowNum(), serial, cmd, picture, expectation));
                     }
                     else {
-                        logger.warn("文件: {}, 行: {}, 的指令不能为空，跳过", filePath, i);
+                        logger.warn("File: {}, Row: {}, Instruction cannot be empty, skipping", filePath, i);
                     }
                 }
                 return testCases;
             }
             else {
-                logger.warn("文件: {}, 的标题行不符合要求(第一行必须为'序号、指令、期望、得分、详情'5列)，请检查", filePath);
+                logger.warn("File: {}, Header row does not meet requirements (first row must be 'No.,Instruction,Image,Expectation,Score,Duration(Total),First Token(Average),Tokens Per Second(Average),Generated Tokens(Total),Context Length,Context Entries,Details' 12 columns), please check", filePath);
             }
+            workbook.close();
+            fis.close();
         } catch (Exception e) {
             logger.error("unknownException: ", e);
         }
         return null;
     }
-    //测试套件：将结果写入得分和详情两列(非并发测试)
+    //Test suite: Write results to Score and Details columns (non-concurrent testing)
     public boolean writeResultToTestSuite(String filePath, List<TestCaseOutput> testCases) {
         if(testCases!=null && !testCases.isEmpty()) {
             try {
                 FileInputStream fis = new FileInputStream(new File(filePath));
                 Workbook workbook = new XSSFWorkbook(fis);
-                Sheet sheet = workbook.getSheetAt(0); // 获取第一个工作表
+                Sheet sheet = workbook.getSheetAt(0);
                 int headerType = checkHeader(sheet.getRow(0));
                 if(headerType == 2) {
                     for (TestCaseOutput testCase : testCases) {
                         if(StringUtils.isNoneBlank(testCase.getScore()) && StringUtils.isNoneBlank(testCase.getDetails())) {
                             Row row = sheet.getRow(testCase.getRowNum());
-                            // 写入得分和详情列
                             Cell scoreCell = row.createCell(4);
                             scoreCell.setCellValue(testCase.getScore());
                             Cell durationCell = row.createCell(5);
@@ -173,7 +177,7 @@ public class ExcelProcessor {
                             detailsCell.setCellValue(testCase.getDetails());
                         }
                         else {
-                            logger.warn("文件: {}, 行: {}, 的得分或详情不能为空，跳过", filePath, testCase.getRowNum());
+                            logger.warn("File: {}, Row: {}, Score or Details cannot be empty, skipping", filePath, testCase.getRowNum());
                         }
                     }
                     FileOutputStream fos = new FileOutputStream(new File(filePath));
@@ -181,7 +185,7 @@ public class ExcelProcessor {
                     fos.close();
                 }
                 else {
-                    logger.warn("文件: {}, 的标题行不符合要求(第一行必须为'序号、指令、期望、得分、详情'五列)，请检查", filePath);
+                    logger.warn("File: {}, Header row does not meet requirements (first row must be 'No.,Instruction,Image,Expectation,Score,Duration(Total),First Token(Average),Tokens Per Second(Average),Generated Tokens(Total),Context Length,Context Entries,Details' 12 columns)", filePath);
                 }
                 workbook.close();
                 fis.close();
@@ -190,9 +194,12 @@ public class ExcelProcessor {
                 logger.error("unknownException: ", e);
             }
         }
+        else {
+            logger.warn("File: {}, No test cases to write", filePath);
+        }
         return false;
     }
-    //并发套件：写入序号、指令、期望、得分、详情5列
+    //Concurrent suite: Write 5 columns - Serial Number, Instruction, Expectation, Score, and Details
     public String writeConcurrencyResultToSuite(String filePath, Map<Integer, TestCaseInput> inputMap, List<TestCaseOutput> outputList) {
         if(outputList!=null && !outputList.isEmpty()) {
             try {
@@ -249,7 +256,7 @@ public class ExcelProcessor {
                 workbook.write(fos);
                 fos.close();
                 workbook.close();
-                logger.info("并发测试，原文件：{},结果文件：{}", filePath, resultPath);
+                logger.info("Concurrent testing, original file: {}, result file: {}", filePath, resultPath);
                 return resultPath;
             } catch (Exception e) {
                 logger.error("unknownException: ", e);
@@ -264,7 +271,7 @@ public class ExcelProcessor {
         boolean isCN = isChinese();
         String[] headers1 = isCN ? cnHeaders1 : enHeaders1;
         String[] headers2 = isCN ? cnHeaders2 : enHeaders2;
-        logger.info("头列数：{}, headers1: {}, headers2: {}", row.getLastCellNum(), headers1.length, headers2.length);
+        logger.info("header column count: {}, headers1: {}, headers2: {}", row.getLastCellNum(), headers1.length, headers2.length);
         if(row.getLastCellNum() == headers1.length) {
             for (int i = 0; i < headers1.length; i++) {
                 if (!headers1[i].equals(row.getCell(i).getStringCellValue())) {
@@ -284,11 +291,11 @@ public class ExcelProcessor {
         return 0;
     }
     /**
-     * 获取单元格的字符串值
+     * Get the string value of a cell
      *
-     * @param row 行对象
-     * @param columnIndex 列索引
-     * @return 字符串值
+     * @param row Row object
+     * @param columnIndex Column index
+     * @return String value
      */
     private String getStringCellValue(Row row, int columnIndex) {
         if (row == null) {
@@ -317,5 +324,158 @@ public class ExcelProcessor {
         Locale defaultLocale = Locale.getDefault();
         String language = defaultLocale.getLanguage();
         return "zh".equals(language);
+    }
+
+    /** revise logic
+     *
+     * @param filePath
+     * @return TestedSuite
+     */
+    public List<TestedSuite> getTestedSuiteList(String filePath) {
+        try {
+            FileInputStream fis = new FileInputStream(new File(filePath));
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheetAt(0);
+            logger.info("Total suite rows: {}", sheet.getLastRowNum());
+            int headerType = checkHeader(sheet.getRow(0));
+            if(headerType == 1) {
+                List<TestedSuite> suiteList = new ArrayList<>();
+                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                    Row row = sheet.getRow(i);
+                    if (row == null) {
+                        continue;
+                    }
+                    String description = getStringCellValue(row, 7);
+                    String result = getStringCellValue(row, 10);
+                    if(StringUtils.isNoneBlank(description) && StringUtils.isNoneBlank(result)) {
+                        suiteList.add(new TestedSuite(row.getRowNum(), description, result));
+                    }
+                    else {
+                        logger.warn("File: {}, Row: {}, description, Result fields cannot be empty, skipping", filePath, i);
+                    }
+                }
+                return suiteList;
+            }
+            else {
+                logger.warn("File: {}, Header row does not meet requirements (first row must be 'No.,Category,Concurrency,Prompt,Tools,LLM,Test Suite,Description,Summary,Execution Time,Result' 11 columns), please check", filePath);
+            }
+            workbook.close();
+            fis.close();
+        } catch (Exception e) {
+            logger.error("unknownException: ", e);
+        }
+        return null;
+    }
+    public SuiteSummary readTestedSuite(String filePath) {
+        try {
+            FileInputStream fis = new FileInputStream(new File(filePath));
+            Workbook workbook = new XSSFWorkbook(fis);
+            Sheet sheet = workbook.getSheetAt(0);
+            logger.info("Total case rows: {}", sheet.getLastRowNum());
+            int headerType = checkHeader(sheet.getRow(0));
+            if(headerType == 2) {
+                String outputMarkdown = "markdown/";
+                if((filePath.endsWith(".xlsx")||filePath.endsWith(".xls"))) {
+                    if(filePath.contains("/")) {
+                        outputMarkdown = outputMarkdown + filePath.substring(filePath.lastIndexOf("/")+1, filePath.lastIndexOf("."))+ System.currentTimeMillis()+"_r.md";
+                    }
+                    else if(filePath.contains("\\")) {
+                        outputMarkdown = outputMarkdown + filePath.substring(filePath.lastIndexOf("\\")+1, filePath.lastIndexOf("."))+ System.currentTimeMillis()+"_r.md";
+                    }
+                }
+                else {
+                    outputMarkdown = outputMarkdown + System.currentTimeMillis() + "r_.md";
+                }
+                SuiteSummaryHandler.appendStringToFile(outputMarkdown,"| No. | Instruction | Image | Expectation | Score | Duration(Total,ms) | First Token(Average) | Tokens Per Second(Average) | Generated Tokens(Total) | Context Length | Context Entries | Details |\n| --- | --- | --- | --- | :---: | :---: | :---: | :---: | --- | --- | --- | --- |\n");
+                int cmdCount = 0;
+                double totalPoint = 0;
+                int deducePointCount = 0;
+                int lessThanSixPointsCount = 0;
+                int lessThanThreePointsCount = 0;
+                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                    Row row = sheet.getRow(i);
+                    if (row == null) {
+                        continue;
+                    }
+                    StringBuilder markdownBuffer = new StringBuilder();
+                    String serial = getStringCellValue(row, 0);
+                    String cmd = getStringCellValue(row, 1);
+                    String picture = getStringCellValue(row, 2);
+                    String expectation = getStringCellValue(row, 3);
+                    String point = getStringCellValue(row, 4);
+                    if(StringUtils.isNoneBlank(cmd) && StringUtils.isNoneBlank(point)) {
+                        cmdCount++;
+                        double score = Double.parseDouble(point);
+                        totalPoint += score;
+                        if(score < 10) {
+                            deducePointCount++;
+                            if(score < 6) {
+                                lessThanSixPointsCount++;
+                                if(score < 3) {
+                                    lessThanThreePointsCount++;
+                                    if(score<0) {
+                                        score = 0;
+                                    }
+                                }
+                            }
+                        }
+                        String duration = getStringCellValue(row, 5);
+                        String firstToken = getStringCellValue(row, 6);
+                        String tokensPerSecond = getStringCellValue(row, 7);
+                        double tokenPerSecond = Double.parseDouble(tokensPerSecond);
+                        String generatedTokens = getStringCellValue(row, 8);
+                        String contextLength = getStringCellValue(row, 9);
+                        String contextEntries = getStringCellValue(row, 10);
+                        String details = getStringCellValue(row, 11);
+                        if(details.endsWith("\n")) {
+                            details = details.substring(0, details.length()-1);
+                        }
+                        details = details.replaceAll("\n", "<br>");
+                        markdownBuffer.append("| ").append(serial).append(" | ").append(cmd.replaceAll("\\R", "<br>")).append(" | ").append(picture!=null?picture:"").append(" | ").append(expectation!=null?expectation:"").append(" | ");
+                        markdownBuffer.append(score).append(" | ").append(duration).append(" | ").append(firstToken).append(" | ").append(String.format("%.2f", tokenPerSecond)).append(" | ").append(generatedTokens).append(" | ").append(contextLength).append(" | ").append(contextEntries).append(" | ").append(details).append(" |\n");
+                        SuiteSummaryHandler.appendStringToFile(outputMarkdown, markdownBuffer.toString());
+                    }
+                    else {
+                        logger.warn("File: {}, Row: {}, Instruction or Score column is null, skipping", filePath, i);
+                    }
+                }
+                return SuiteSummaryHandler.dealSuiteOutputSummary((int)totalPoint, cmdCount, deducePointCount, lessThanSixPointsCount, lessThanThreePointsCount, outputMarkdown);
+            }
+            else {
+                logger.warn("File: {}, Header row does not meet requirements (first row must be 'No.,Instruction,Image,Expectation,Score,Duration(Total),First Token(Average),Tokens Per Second(Average),Generated Tokens(Total),Context Length,Context Entries,Details' 12 columns), please check", filePath);
+            }
+            workbook.close();
+            fis.close();
+        } catch (Exception e) {
+            logger.error("unknownException: ", e);
+        }
+        return null;
+    }
+    public void updateSuiteSummaryToTestPlan(String filePath, int rowNum, SuiteSummary suiteSummary) {
+        if(StringUtils.isNoneBlank(suiteSummary.getSummary()) && rowNum>0) {
+            try {
+                FileInputStream fis = new FileInputStream(new File(filePath));
+                Workbook workbook = new XSSFWorkbook(fis);
+                Sheet sheet = workbook.getSheetAt(0);
+                int headerType = checkHeader(sheet.getRow(0));
+                if(headerType == 1) {
+                    Row row = sheet.getRow(rowNum);
+                    //only update summary
+                    Cell summaryCell = row.createCell(8);
+                    summaryCell.setCellValue(suiteSummary.getSummary());
+                    FileOutputStream fos = new FileOutputStream(new File(filePath));
+                    workbook.write(fos);
+                    fos.close();
+                    logger.info("File: {}, Row: {}, Summary updated", filePath, rowNum);
+                }
+                else {
+                    logger.warn("File: {}, Header row does not meet requirements (first row must be 'No.,Category,Concurrency,Prompt,Tools,LLM,Test Suite,Description,Summary,Execution Time,Result' 11 columns)", filePath);
+                }
+                workbook.close();
+                fis.close();
+            } catch (Exception e) {
+                logger.error("unknownException: ", e);
+            }
+        }
     }
 }

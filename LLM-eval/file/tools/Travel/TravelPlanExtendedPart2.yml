@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: 路线规划,涉及共享单车、步行、航班、火车、长途汽车
 servers:
-  - url: 'http://192.168.2.201:8083/travel-plans-extended'
+  - url: 'http://192.168.2.201:8089/travel-plans-extended'
 paths:
   '/{planId}/transport/bike-sharing':
     get:

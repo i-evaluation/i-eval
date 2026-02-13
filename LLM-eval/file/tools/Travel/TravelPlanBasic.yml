@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: "可创建，更新、获取，删除旅游计划"
 servers:
-  - url: http://192.168.2.201:8083/travel-plans/basic
+  - url: http://192.168.2.201:8089/travel-plans/basic
 
 paths:
   /:

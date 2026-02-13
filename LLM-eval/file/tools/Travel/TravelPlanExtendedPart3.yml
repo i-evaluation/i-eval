@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: 交通规划，涉及轮渡、交通费用估算、交通时间估算、拥堵预测、交通替代方案
 servers:
-  - url: 'http://192.168.2.201:8083/travel-plans-extended'
+  - url: 'http://192.168.2.201:8089/travel-plans-extended'
 paths:
   '/{planId}/transport/ferry':
     get:

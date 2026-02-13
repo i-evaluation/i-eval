@@ -27,32 +27,32 @@ public class Agent {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     //agent id
     protected Integer id;
-    //agent名称
+    //agent name
     protected String name;
-    //提示词
+    //system prompt
     protected String prompt;
     protected JSONArray tools;
     protected Map<String, FunctionInfo> functionInfoMap;
     private String sessionId;
     protected boolean isFirst;
     protected boolean isSingle;
-    //0：普通，1：分发，2：反思
+    //0: normal, 1: dispatch, 2: reflection
     protected int kind;
     private int iterations;
-    //聊天参数
+    //chat parameters
     private ChatConfig chatConfig;
     protected ChatOptions chatOptions;
     private LlmHttpClient openAiClient;
     protected ChatMemory memory;
-    //产出
-    //tokens(流量统计)
+    //output
+    //tokens (traffic statistics)
     private JSONArray costList;
 
-    //输出通道
+    //output channel
     private EventBus outputBus;
-    //子agent: 普通
+    //child agents: normal
     private List<Agent> childrenList;
-    //反思agent
+    //reflection agent
     private Agent reflectAgent;
     private int reflectionCnt;
     private boolean isContinuousChat = true;
@@ -200,7 +200,7 @@ public class Agent {
         if(chatOptions.isStream()) {
             OpenAiSseClient sseClient = new OpenAiSseClient();
             sseClient.request(chatConfig, chatOptions, memory.getMessages(rawCmd), tools);
-            while(!sseClient.isDeltaFinished() && sseClient.getCheckTimes()<1200) {
+            while(!sseClient.isDeltaFinished() && sseClient.getCheckTimes()<365) {
                 TimeUtil.waitFor(500);
             }
             chatResponse = sseClient.getChatResponse();
@@ -212,6 +212,7 @@ public class Agent {
         List<FunctionCall> toolCalls = chatResponse.getFunctionCalls();
         if(chatResponse.getAnomalous()!=null && StringUtils.isNoneBlank(chatResponse.getAnomalous().toString())) {
             logger.warn("anomalous: {}", chatResponse.getAnomalous());
+            llmOutputArray.add(collectAnomalous(chatResponse, memory.getContextSize(), 180000));
         }
         if(chatResponse.getUsage()!=null && chatResponse.getUsage().containsKey("totalTokens")) {
             costList.add(chatResponse.getUsage());
@@ -223,7 +224,7 @@ public class Agent {
                 if(chatOptions.isStream()) {
                     OpenAiSseClient sseClient2 = new OpenAiSseClient();
                     sseClient2.request(chatConfig, chatOptions, memory.getMessages(rawCmd), tools);
-                    while(!sseClient2.isDeltaFinished() && sseClient2.getCheckTimes()<1200) {
+                    while(!sseClient2.isDeltaFinished() && sseClient2.getCheckTimes()<365) {
                         TimeUtil.waitFor(500);
                     }
                     chatResponse2 = sseClient2.getChatResponse();
@@ -235,6 +236,7 @@ public class Agent {
                 List<FunctionCall> toolCalls2 = chatResponse2.getFunctionCalls();
                 if(chatResponse2.getAnomalous()!=null && StringUtils.isNoneBlank(chatResponse2.getAnomalous().toString())) {
                     logger.warn("anomalous: {}", chatResponse2.getAnomalous());
+                    llmOutputArray.add(collectAnomalous(chatResponse2, memory.getContextSize(), 180000));
                 }
                 if(chatResponse2.getUsage()!=null && chatResponse2.getUsage().containsKey("totalTokens")) {
                     costList.add(chatResponse2.getUsage());
@@ -334,12 +336,12 @@ public class Agent {
         return isCalled;
     }
     /**
-     * funcCallId: 方法调用id(由大模型返回)
-     * method: 调用的方法名
-     * executor: 方法调用执行器
-     * messages：上下文信息
-     * argsObject: 参数对象
-     * functionInfo: 方法执行信息(包括api地址，所用方法等)
+     * funcCallId: method call id (returned by the large model)
+     * method: called method name
+     * executor: method call executor
+     * messages: context information
+     * argsObject: parameter object
+     * functionInfo: method execution information (including api address, method used, etc.)
      * */
     private JSONObject callMethod(String funcCallId, String method, FunctionCallExecutor executor, JSONObject argsObject, FunctionInfo functionInfo, String rawCmd) {
         //方法调用信息，需加入上下文
@@ -468,15 +470,15 @@ public class Agent {
     private String getShortContent(String content, int maxLength) {
         if(content!=null) {
             if(content.length()>maxLength) {
-                return content.substring(0, maxLength) + "...此处省略" + (content.length()-maxLength);
+                return content.substring(0, maxLength) + "...Omit here" + (content.length()-maxLength);
             }
         }
         return content;
     }
     private JSONObject collectContent(ChatResponse chatResponse, int contextSize) {
         JSONObject result = new JSONObject();
-        result.put("text", getShortContent(chatResponse.getContent(), 600));
-        result.put("firstToken", 0);
+        result.put("text", getShortContent(chatResponse.getContent(), 500));
+        result.put("firstToken", chatResponse.getFirstTokenTime());
         if(chatResponse.getUsage()!=null) {
             result.put("completionTokens", chatResponse.getUsage().getInteger("completionTokens"));
             result.put("promptTokens", chatResponse.getUsage().getInteger("promptTokens"));
@@ -484,6 +486,23 @@ public class Agent {
         }
         result.put("duration", chatResponse.getDuration());
         result.put("tokenPerSecond", chatResponse.getTokenPerSecond());
+        result.put("contextSize", contextSize);
+        return result;
+    }
+    private JSONObject collectAnomalous(ChatResponse chatResponse, int contextSize, long duration) {
+        JSONObject result = new JSONObject();
+        JSONObject anomalous = chatResponse.getAnomalous();
+        if(anomalous!=null) {
+            String info = anomalous.containsKey("info")?anomalous.getString("info"):(anomalous.containsKey("msg")?anomalous.getString("msg"):"timeout");
+            result.put("text", info);
+            result.put("isAnomalous", true);
+        }
+        result.put("firstToken", 0);
+        result.put("completionTokens", 0);
+        result.put("promptTokens", 0);
+        result.put("model", chatConfig.getModel());
+        result.put("duration", duration);
+        result.put("tokenPerSecond", 0);
         result.put("contextSize", contextSize);
         return result;
     }

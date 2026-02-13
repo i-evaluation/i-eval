@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: CNC加工计划控制器API
+  description: CNC加工计划管理相关接口
+  version: 1.0.0
+  contact:
+    name: CNC加工计划管理API
+servers:
+  - url: http://192.168.2.201:8089
+    description: 开发环境服务器
+tags:
+  - name: 加工计划
+    description: 加工计划管理相关操作
+paths:
+  /cnc/process/plans:
+    post:
+      tags:
+        - 加工计划
+      summary: 上传加工计划
+      description: 上传加工计划信息
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planName:
+                  type: string
+                  description: 计划名称
+                  example: "示例加工计划"
+              required:
+                - planName
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  planId:
+                    type: integer
+                    example: 1695476400000
+                  planName:
+                    type: string
+                    example: "示例加工计划"
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2025-09-15T10:30:00Z"
+    get:
+      tags:
+        - 加工计划
+      summary: 查询所有加工计划
+      description: 获取所有加工计划列表
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  plans:
+                    type: array
+                    items:
+                      type: string
+                    example: ["计划A", "计划B"]
+  /cnc/process/plans/{planId}:
+    get:
+      tags:
+        - 加工计划
+      summary: 查询单个加工计划
+      description: 根据计划ID查询加工计划详情
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 计划ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  planId:
+                    type: integer
+                    example: 1
+                  planName:
+                    type: string
+                    example: "示例加工计划"
+                  status:
+                    type: string
+                    example: "进行中"
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "无效的计划ID"
+  /cnc/process/plans/{planId}/tasks:
+    get:
+      tags:
+        - 加工计划
+      summary: 查询计划下所有任务
+      description: 根据计划ID查询该计划下的所有任务
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 计划ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  planId:
+                    type: integer
+                    example: 1
+                  tasks:
+                    type: array
+                    items:
+                      type: string
+                    example: ["任务1", "任务2"]
+

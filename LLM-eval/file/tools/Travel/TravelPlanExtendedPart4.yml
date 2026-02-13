@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: 交通和导航功能，涉及实时状态、历史数据、优化、费用对比、综合报告
 servers:
-  - url: 'http://192.168.2.201:8083/travel-plans-extended'
+  - url: 'http://192.168.2.201:8089/travel-plans-extended'
 paths:
   '/travel-plans-extended/{planId}/transport/real-time-status':
     get:

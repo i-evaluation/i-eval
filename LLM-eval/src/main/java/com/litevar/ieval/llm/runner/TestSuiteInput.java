@@ -13,8 +13,9 @@ public class TestSuiteInput {
     private String tools;
     private String llmConfig;
     private String suite;
+    private String description;
 
-    public TestSuiteInput(int rowNum, String serial, String category, String concurrency, String prompt, String tools, String llmConfig, String suite) {
+    public TestSuiteInput(int rowNum, String serial, String category, String concurrency, String prompt, String tools, String llmConfig, String suite, String description) {
         this.rowNum = rowNum;
         this.serial = serial;
         this.category = category;
@@ -23,6 +24,7 @@ public class TestSuiteInput {
         this.tools = tools;
         this.llmConfig = llmConfig;
         this.suite = suite;
+        this.description = description;
     }
     public int getRowNum() {
         return rowNum;
@@ -71,5 +73,11 @@ public class TestSuiteInput {
     }
     public void setSuite(String suite) {
         this.suite = suite;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

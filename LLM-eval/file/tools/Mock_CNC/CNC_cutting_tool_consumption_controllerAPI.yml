@@ -1,0 +1,120 @@
+openapi: 3.0.3
+info:
+  title: CNC刀具控制器API
+  description: CNC刀具管理和使用记录相关接口
+  version: 1.0.0
+  contact:
+    name: CNC刀具管理API
+servers:
+  - url: http://192.168.2.201:8089
+    description: 开发环境服务器
+paths:
+  /cnc/process/tools/usage/{toolId}:
+    get:
+      tags:
+        - 使用记录
+      summary: 查询刀具使用记录
+      description: 查询指定刀具的使用记录
+      parameters:
+        - name: toolId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 刀具ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  toolId:
+                    type: integer
+                    example: 1
+                  usageRecords:
+                    type: array
+                    items:
+                      type: string
+                    example: ["使用1h", "使用3h"]
+  /cnc/process/tools/consumption:
+    post:
+      tags:
+        - 消耗统计
+      summary: 上传刀具消耗统计
+      description: 上传刀具消耗统计数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                toolId:
+                  type: integer
+                  description: 刀具ID
+                  example: 1
+                consumptionValue:
+                  type: string
+                  description: 消耗值
+                  example: "50%"
+              required:
+                - toolId
+                - consumptionValue
+      responses:
+        '200':
+          description: 上传成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  consumptionId:
+                    type: integer
+                    example: 1695476400000
+                  toolId:
+                    type: integer
+                    example: 1
+                  consumptionValue:
+                    type: string
+                    example: "50%"
+  /cnc/process/tools/consumption/{toolId}:
+    get:
+      tags:
+        - 消耗统计
+      summary: 查询刀具消耗统计
+      description: 查询指定刀具的消耗统计
+      parameters:
+        - name: toolId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 刀具ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  toolId:
+                    type: integer
+                    example: 1
+                  consumptionValue:
+                    type: string
+                    example: "50%"
+  

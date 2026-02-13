@@ -4,7 +4,7 @@ info:
   description: 旅行计划预订相关的接口文档，包括酒店、航班、租车和门票的预订、查询和取消功能。
   version: 1.0.0
 servers:
-  - url: http://192.168.2.35:8081/travel-plans/booking
+  - url: http://192.168.2.201:8089/travel-plans/booking
 
 paths:
   # 酒店预订相关接口

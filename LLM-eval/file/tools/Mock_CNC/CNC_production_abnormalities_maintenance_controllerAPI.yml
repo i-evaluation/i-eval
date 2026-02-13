@@ -6,7 +6,7 @@ info:
   contact:
     name: CNC生产异常与维护API
 servers:
-  - url: http://192.168.2.201:8083
+  - url: http://192.168.2.201:8089
     description: 开发环境服务器
 tags:
   - name: 异常处理

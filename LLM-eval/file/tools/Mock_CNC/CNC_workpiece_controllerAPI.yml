@@ -6,8 +6,7 @@ info:
   contact:
     name: CNC工件管理API
 servers:
-  - url: http://192.168.2.201:8083
-    description: 开发环境服务器
+  - url: http://192.168.2.201:8089
 tags:
   - name: 工件管理
     description: 工件信息管理相关操作

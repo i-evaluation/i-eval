@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: 旅游文档管理-添加、查看、更新、删除旅游文档，删除旅游同伴
 servers:
-  - url: 'http://192.168.2.201:8083/travel-plans/management'
+  - url: 'http://192.168.2.201:80839avel-plans/management'
 paths:
   '/{planId}/companions/{companionId}':
     delete:

@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: 美食和餐厅相关
 servers:
-  - url: 'http://l192.168.2.201:8083/travel-plans-final'
+  - url: 'http://l192.168.2.201:8089/travel-plans-final'
 paths:
   '/{planId}/restaurants/recommendations':
     get:

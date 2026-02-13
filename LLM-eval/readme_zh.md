@@ -32,6 +32,7 @@
       - 存在时减1分
     - 函数参数格式出错(json格式错误)
       - 存在时减2分
+    - 模型返回400或500错误时，减5分
   - 用例期望(条件设置)
     - 生成函数数量
       - 实际函数数量与预期不等时，减5分
@@ -43,6 +44,8 @@
       - 实际生成token数量小于预期时，减5分
     - 文本格式(json)
       - 实际生成文本不是标准json(格式错误)时，减5分
+  - 人工审核
+    - 出现幻觉：减5分
 
 ### 其他参考数据
   - 上下文长度
@@ -104,28 +107,30 @@
   - file/tools：工具集(openapi,jsonrpc工具schema文件)
   - records: 执行用例时产生的json文件
   - mock_tools: 工具schema文件的server实现
+  - markdown: 执行测试集的结果文件，markdown格式
+
 ### 准备工作
 1. 当前目录下创建file,records子目录
 2. file文件夹下，创建testPlan.xlsx文件，格式如下
 
-| 序号 |  类别  | 并发数 | 提示词  | 工具                                                                                                                | 大模型                                                                                                                                                                                                                     | 用例集                              | 总结 | 执行时间 | 结果 |
-|:---|:----:|:----|:-----|:------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------| :---: | :--- | :--- |
-| 1  | 连续对话 | 1   | 提示词1 | [{"schema": "file/tools/datetime_weather.yml","apiKey": ""}, {"schema": "file/tools/shopping.json","apiKey": ""}] | {"type":"openai", "chatConfig": {"model":"deepseek-chat", "endpoint":"https://api.deepseek.com", "apiKey":"you-apiKey", "apiSecret":""}, "chatOptions":{"temperature":0.1, "maxTokens":10240, "seed":7,"stream":false}} | file/suite/continuousChat1.xlsx  | NA | NA | NA |
-| 2  | 单次对话 | 1   | 提示词2 | [{"schema": "file/tools/datetime_weather.yml","apiKey": ""}, {"schema": "file/tools/shopping.json","apiKey": ""}] | {"type":"openai", "chatConfig": {"model":"deepseek-chat", "endpoint":"https://api.deepseek.com", "apiKey":"you-apiKey", "apiSecret":""}, "chatOptions":{"temperature":0.1, "maxTokens":10240, "seed":7,"stream":false}} | file/suite/singleTimeChat1.xlsx  | NA | NA | NA |
-| 3  | 连续并发 | 4   | 提示词3 | [{"schema": "file/tools/datetime_weather.yml","apiKey": ""}, {"schemaDir": "file/tools/equipment","apiKey": ""}]  | {"type":"openai", "chatConfig": {"model":"deepseek-chat", "endpoint":"https://api.deepseek.com", "apiKey":"you-apiKey", "apiSecret":""}, "chatOptions":{"temperature":0.1, "maxTokens":10240, "seed":7,"stream":false}} | file/suite/concurrencyChat1.xlsx | NA | NA | NA |
+| 序号 | 类别 | 并发数 | 提示词 | 工具 | 大模型 | 用例集 | 描述 | 总结 | 执行时间 | 结果 |
+|:---|:----:|:---|:---|:---|:---|:---|:---|:--:|:---|:---|
+| 1  | 连续对话 | 1   | 提示词1 | [{"schema": "file/tools/datetime_weather.yml","apiKey": ""}, {"schema": "file/tools/shopping.json","apiKey": ""}] | {"type":"openai", "chatConfig": {"model":"deepseek-chat", "endpoint":"https://api.deepseek.com", "apiKey":"you-apiKey", "apiSecret":""}, "chatOptions":{"temperature":0.1, "maxTokens":10240, "seed":7,"stream":false}} | file/suite/continuousChat1.xlsx | 函数调用：普通crud | NA | NA | NA |
+| 2  | 单次对话 | 1   | 提示词2 | [{"schema": "file/tools/datetime_weather.yml","apiKey": ""}, {"schema": "file/tools/shopping.json","apiKey": ""}] | {"type":"openai", "chatConfig": {"model":"deepseek-chat", "endpoint":"https://api.deepseek.com", "apiKey":"you-apiKey", "apiSecret":""}, "chatOptions":{"temperature":0.1, "maxTokens":10240, "seed":7,"stream":false}} | file/suite/singleTimeChat1.xlsx  | 函数调用：长列表    | NA | NA | NA |
+| 3  | 连续并发 | 4   | 提示词3 | [{"schema": "file/tools/datetime_weather.yml","apiKey": ""}, {"schemaDir": "file/tools/equipment","apiKey": ""}]  | {"type":"openai", "chatConfig": {"model":"deepseek-chat", "endpoint":"https://api.deepseek.com", "apiKey":"you-apiKey", "apiSecret":""}, "chatOptions":{"temperature":0.1, "maxTokens":10240, "seed":7,"stream":false}} | file/suite/concurrencyChat1.xlsx | 函数调用：大返回体   | NA | NA | NA |
   - 第一行(header)必须按上述规则复制
+  - "描述"指的是测试集的用途或目的
   - 其中"工具"是可选的，支持openapi,jsonrpc格式；"提示词", "大模型", "用例集"为必填项
-    - 工具可以指定为json或yaml文件，如{"schema": "file/tools/datetime_weather.yml","apiKey": ""} ，也可以指定为目录(扫描目录中的所有json或yml文件，不支持递归)，如{"schemaDir": "file/tools/equipment"}
+    - 工具可以指定为json或yaml文件，如{"schema": "file/tools/datetime_weather.yml","apiKey": ""} ，也可以指定为目录(扫描目录中的所有json或yml文件，不支持递归)，如{"schemaDir": "file/tools/equipment","apiKey": ""}
   - "总结", "执行时间", "结果"为执行后生成的结果，无须填写
 3. file文件夹下创建suite和tools子目录
   - 将testPlan.xlsx中指定的工具复制到tools子目录下
   - 将testPlan.xlsx中指定的用例集复制到suite子目录下，用例集格式如下
-
-    | 序号 |      指令      | 图片 | 期望                                                                  | 得分 | 时长(总) | 首token(平均) | token每秒(平均) | 生成token数(总) | 上下文长度 | 上下文条数 | 详情 |
-    |:---|:------------|:---|:--------------------------------------------------------------------|:--:|:------|:-----------|:-----------:|:------------|:------|:------|:---|
-    | 1  | 今天是什么日子，天气如何 |    | {"completionTokens":"20", "fcSequence":"date-time_GET,weather_GET"} | NA | NA    | NA         |     NA      | NA          | NA    | NA    | NA |
-    | 2  | 帮我点一杯星巴克冰美式  |    | {"completionTokens":"10", "fcCount":1}                              | NA | NA    | NA         |     NA      | NA          | NA    | NA    | NA |
-    | 3  | 帮我打开空调，设置为制冷模式  |    | {"completionTokens":"10","fcCount":2,"fcInfo":{"apiair-conditionerupdate_POST":4,"apiair-conditionerset_POST":1}}   | NA | NA    | NA         |     NA      | NA          | NA    | NA    | NA |
+    | 序号 | 指令 | 图片 | 期望 | 得分 | 时长(总) | 首token(平均) | token每秒(平均) | 生成token数(总) | 上下文长度 | 上下文条数 | 详情 |
+    |:---|:---|:---|:---|:---:|:---|:---|:---:|:---|:---|:---|:---|
+    | 1 | 今天是什么日子，天气如何 |    | {"completionTokens":"20", "fcSequence":"date-time_GET,weather_GET"} | NA | NA | NA | NA | NA | NA | NA | NA |
+    | 2  | 帮我点一杯星巴克冰美式    |    | {"completionTokens":"10", "fcCount":1} | NA | NA | NA | NA | NA | NA | NA | NA |
+    | 3  | 帮我打开空调，设置为制冷模式 |    | {"completionTokens":"10","fcCount":2,"fcInfo":{"apiair-conditionerupdate_POST":4,"apiair-conditionerset_POST":1}} | NA | NA | NA | NA | NA | NA | NA | NA |
     - 第一行(header)必须按上述规则复制
     - “期望"是可选的，fcSequence是指调用的方法顺序，fcCount指该条用例预期调用的方法数，fcInfo指该条用例预期调用的方法及对应方法预期传递的参数个数；"图片"是vision模型才需输入，为http协议url或本地图片(png,jpg或jpeg)，多个图片以英文逗号分隔
     - "得分", "时长(总)", "首token(平均)", "token每秒(平均)", "生成token数(总)", "上下文长度", "上下文条数", "详情"为执行后生成的结果，无须填写
@@ -135,3 +140,7 @@
     - 套件目录下(file/suite)，生成${suite}.json文件，为每个套件结束时的json数据(对应testPlan.xlsx中的每一行,可供前端显示)
     - records文件夹下，生成${sessionId}.json文件，为每个套件测试结束时的全量上下文(并发测试时，每个线程均生成一个文件)
     - 并发测试时，file/suite目录下，生成${suite}${timestamp}.xlsx文件，为每个套件结束时的执行数据
+
+2. 人工审核发现出现幻觉时
+  - 在得分列中，将原来的分数减去5，同时在详情列中追加减分原因：Having hallucinations, deduct 5 points(存在幻觉，扣5分)
+  - 运行MainReviser.main()更新测试总结(testPlan的总结列)markdown报告

@@ -47,7 +47,7 @@ public class RestUtil {
         }
         return HttpRequest.delete(url).execute();
     }
-    //返回标准json
+    //return standard json
     public static JSONObject getWithHeader(String url, Map<String,String> headers) {
         if(!url.contains("key")) {
             logger.info("url: {}", url);
@@ -58,7 +58,7 @@ public class RestUtil {
             String bodyString = response.body();
             if(bodyString==null) {
                 JSONObject obj = new JSONObject();
-                logger.error("返回体为空，请手动检查接口: {}", url);
+                logger.error("The return body is empty, please manually check the target interface: {}", url);
                 obj.put("code", 404);
                 obj.put("info", "api server return null body");
                 return obj;
@@ -76,7 +76,7 @@ public class RestUtil {
             return obj;
         }
     }
-    //返回标准json
+    //return standard json
     public static JSONObject postWithHeader(String url, Map<String,String> headers, String sendBody) {
         logger.info("url: {}", url);
         //data:image/jpeg;base64
@@ -89,7 +89,7 @@ public class RestUtil {
             String bodyString = response.body();
             if(bodyString==null) {
                 JSONObject obj = new JSONObject();
-                logger.error("返回体为空，请手动检查接口: {}", url);
+                logger.error("The return body is empty, please manually check the target interface: {}", url);
                 obj.put("code", 404);
                 obj.put("info", "Api return null body");
                 return obj;
@@ -113,7 +113,7 @@ public class RestUtil {
             return obj;
         }
     }
-    //非标准json
+    //return Non standard json
     public static JSONObject sendGet(String url, Map<String,String> headers) {
         logger.info("url: {}", url);
         JSONObject obj = new JSONObject();
@@ -122,7 +122,7 @@ public class RestUtil {
             logger.info("httpStatus: {}", response.getStatus());
             String bodyString = response.body();
             if(bodyString==null) {
-                logger.error("返回体为空，请手动检查接口: {}", url);
+                logger.error("The return body is empty, please manually check the target interface: {}", url);
                 obj.put("code", 404);
                 obj.put("info", "api server return null body");
             }
@@ -137,7 +137,7 @@ public class RestUtil {
         }
         return obj;
     }
-    //非标准json
+    //return Non standard json
     public static JSONObject sendPost(String url, Map<String,String> headers, String sendBody) {
         logger.info("url: {}", url);
         logger.info("sendBody: {}", sendBody);
@@ -147,7 +147,7 @@ public class RestUtil {
             logger.info("httpStatus: {}", response.getStatus());
             String bodyString = response.body();
             if(bodyString==null) {
-                logger.error("返回体为空，请手动检查接口: {}", url);
+                logger.error("The return body is empty, please manually check the target interface: {}", url);
                 obj.put("code", 404);
                 obj.put("info", "api server return null body");
             }
@@ -162,7 +162,7 @@ public class RestUtil {
         }
         return obj;
     }
-    //非标准json
+    //return Non standard json
     public static JSONObject sendPut(String url, Map<String,String> headers, String sendBody) {
         logger.info("url: {}", url);
         logger.info("sendBody: {}", sendBody);
@@ -172,7 +172,7 @@ public class RestUtil {
             logger.info("httpStatus: {}", response.getStatus());
             String bodyString = response.body();
             if(bodyString==null) {
-                logger.error("返回体为空，请手动检查接口: {}", url);
+                logger.error("The return body is empty, please manually check the target interface: {}", url);
                 obj.put("code", 404);
                 obj.put("info", "api server return null body");
             }
@@ -187,7 +187,7 @@ public class RestUtil {
         }
         return obj;
     }
-    //非标准json
+    //return Non standard json
     public static JSONObject sendDelete(String url, Map<String,String> headers) {
         logger.info("url: {}", url);
         JSONObject obj = new JSONObject();
@@ -196,7 +196,7 @@ public class RestUtil {
             logger.info("httpStatus: {}", response.getStatus());
             String bodyString = response.body();
             if(bodyString==null) {
-                logger.error("返回体为空，请手动检查接口: {}", url);
+                logger.error("The return body is empty, please manually check the target interface: {}", url);
                 obj.put("code", 404);
                 obj.put("info", "api server return null body");
             }

@@ -2,13 +2,7 @@ package com.litevar.ieval.llm.memory;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.litevar.ieval.llm.chat.AgentEvent;
 import org.apache.commons.lang3.StringUtils;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
 /**
  * @Author  action
@@ -16,17 +10,8 @@ import java.nio.file.StandardOpenOption;
  * @company litevar
  **/
 public class FullAmountMemory extends ChatMemory {
-    private static final String OUTPUT_DIR = "records/";
-    private final JSONArray messages = new JSONArray();
     public FullAmountMemory() {
-        Path path = Paths.get(OUTPUT_DIR);
-        if(Files.notExists(path)) {
-            try {
-                Files.createDirectories(path);
-            } catch (Exception e) {
-                logger.error("create directory error: ", e);
-            }
-        }
+        super();
     }
     @Override
     public JSONArray getMessages(String userCmd) {
@@ -109,15 +94,5 @@ public class FullAmountMemory extends ChatMemory {
         }
         return null;
     }
-    private void saveMemoryToFile(String sessionId){
-        try {
-            Path path = Paths.get(OUTPUT_DIR + sessionId + ".json");
-            if(Files.exists(path)) {
-                Files.deleteIfExists(path);
-            }
-            Files.write(path, messages.toJSONString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        } catch (Exception e) {
-            logger.error("write file error: ", e);
-        }
-    }
+
 }

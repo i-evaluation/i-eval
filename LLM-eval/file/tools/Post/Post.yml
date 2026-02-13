@@ -13,7 +13,7 @@ info:
     email: support@example.com
 
 servers:
-  - url: https://192.168.2.201:8083/posts
+  - url: https://192.168.2.201:8089/posts
 
 
 paths:

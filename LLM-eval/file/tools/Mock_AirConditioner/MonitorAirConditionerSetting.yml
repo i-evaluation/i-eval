@@ -4,7 +4,7 @@ info:
   description: 获取空调设备运行时的详细性能参数和监控数据
   version: 1.0.0
 servers:
-  - url: http://192.168.2.201:8083
+  - url: http://192.168.2.201:8089
 paths:
   /api/air-conditioner/performance:
     post:

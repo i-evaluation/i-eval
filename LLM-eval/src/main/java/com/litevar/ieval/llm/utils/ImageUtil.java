@@ -16,10 +16,10 @@ public class ImageUtil {
     private static Logger logger = LoggerFactory.getLogger(ImageUtil.class);
     public static String toBase64(String picturePath) {
         try {
-            // 读取文件为字节数组
+            // Read the file into a byte array
             byte[] imageBytes = Files.readAllBytes(Paths.get(picturePath));
 
-            // 将字节数组编码为Base64字符串
+            // Encode the byte array as a Base64 string
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
             if(picturePath.endsWith(".png")) {
                 return "data:image/png;base64," + base64Image;

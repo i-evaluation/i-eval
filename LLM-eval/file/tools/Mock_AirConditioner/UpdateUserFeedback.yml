@@ -4,7 +4,7 @@ info:
   description: 设置空调设备的用户反馈
   version: 1.0.0
 servers:
-  - url: http://192.168.2.201:8083
+  - url: http://192.168.2.201:8089
 paths:
   /api/air-conditioner/set:
     post:

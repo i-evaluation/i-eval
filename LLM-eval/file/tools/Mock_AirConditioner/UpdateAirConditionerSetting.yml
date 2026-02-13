@@ -4,7 +4,7 @@ info:
   description: 更新空调设备的各项参数设置
   version: 1.0.0
 servers:
-  - url: http://192.168.2.201:8083
+  - url: http://192.168.2.201:8089
 paths:
   /api/air-conditioner/update:
     post:

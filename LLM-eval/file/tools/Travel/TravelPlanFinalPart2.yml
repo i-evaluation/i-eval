@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: 社交和分享，涵盖分享旅游计划，查看旅游计划评论，点赞旅游计划
 servers:
-  - url: 'http://192.168.201:8083/travel-plans-final'
+  - url: 'http://192.168.201:8089/travel-plans-final'
 paths:
   '/{planId}/share':
     post:

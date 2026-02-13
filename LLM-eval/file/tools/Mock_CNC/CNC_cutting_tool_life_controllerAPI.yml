@@ -1,0 +1,86 @@
+openapi: 3.0.3
+info:
+  title: CNC刀具寿命管理控制器API
+  description: CNC刀具寿命管理相关接口
+  version: 1.0.0
+  contact:
+    name: CNC刀具管理API
+servers:
+  - url: http://192.168.2.201:8089
+    description: 开发环境服务器
+paths:
+  /cnc/process/tools/life/{toolId}:
+    get:
+      tags:
+        - 寿命管理
+      summary: 查询刀具剩余寿命
+      description: 查询刀具剩余使用寿命
+      parameters:
+        - name: toolId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 刀具ID
+          example: 1
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  toolId:
+                    type: integer
+                    example: 1
+                  remainingLife:
+                    type: string
+                    example: "100小时"
+  /cnc/process/tools/life/{toolId}/adjust:
+    post:
+      tags:
+        - 寿命管理
+      summary: 调整刀具寿命
+      description: 调整刀具寿命设置
+      parameters:
+        - name: toolId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 刀具ID
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newLife:
+                  type: string
+                  description: 新的寿命值
+                  example: "120小时"
+              required:
+                - newLife
+      responses:
+        '200':
+          description: 调整成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  toolId:
+                    type: integer
+                    example: 1
+                  newLife:
+                    type: string
+                    example: "120小时"

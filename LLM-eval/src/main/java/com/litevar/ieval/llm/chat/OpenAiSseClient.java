@@ -72,13 +72,16 @@ public class OpenAiSseClient {
         if(!messages.toJSONString().contains("data:image/jpeg;base64")) {
             logger.info("sendBody: {}", sendPayloadObj);
         }
+        String url = "/v1/chat/completions";
+        if(config.getModel().startsWith("glm-")) url = "/api/paas/v4/chat/completions";
         Request request = new Request.Builder()
-                .url(config.getEndpoint()+"/v1/chat/completions")
+                .url(config.getEndpoint()+url)
+                //.url(config.getEndpoint()+"/v1/chat/completions")
                 .addHeader("Authorization", "Bearer " + config.getApiKey())
                 .addHeader("Accept", "text/event-stream") // 指定接受SSE格式的数据
                 .post(RequestBody.create(sendPayloadObj.toJSONString(), MediaType.parse("application/json")))
                 .build();
-        OkHttpClient client = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).readTimeout(600, TimeUnit.SECONDS).build();
+        OkHttpClient client = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).readTimeout(180, TimeUnit.SECONDS).build();
         start = System.currentTimeMillis();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -151,7 +154,7 @@ public class OpenAiSseClient {
         }
         else if(deltaObject.containsKey("choices") && deltaObject.get("choices")!=null) {
             JSONObject choice0 = deltaObject.getJSONArray("choices").getJSONObject(0);
-            if(choice0.containsKey("finish_reason") && StringUtils.isNoneBlank(choice0.getString("finish_reason")) && !"tool_call".equals(choice0.getString("finish_reason"))) {
+            if(choice0.containsKey("finish_reason") && StringUtils.isNoneBlank(choice0.getString("finish_reason")) && "stop".equals(choice0.getString("finish_reason"))) {
                 logger.debug("event: {} finish, reason: {}", deltaObject.getString("id"), choice0.getString("finish_reason"));
                 deltaFinished = true;
                 countUsage(deltaObject.getString("id"), model);
@@ -210,17 +213,20 @@ public class OpenAiSseClient {
                         if("<think>".equals(contents.toString())) {
                             pushDelta = "<think>" + pushDelta;
                         }
-                        logger.info("ai-text-delta: {}, completionId: {}", pushDelta, deltaObject.getString("id"));
+                        logger.debug("ai-think-delta: {}, completionId: {}", pushDelta, deltaObject.getString("id"));
                     }
                     else if("</think>".equals(deltaStr)) {
                         if(!"<think>".equals(contents.toString().trim())) {
-                            logger.info("ai-text-delta: {}, completionId: {}", deltaStr, deltaObject.getString("id"));
+                            logger.debug("ai-think-delta: {}, completionId: {}", deltaStr, deltaObject.getString("id"));
                         }
                     }
                     contents.append(deltaStr);
                 }
                 else if(delta.containsKey("content") && delta.getString("content")!=null) {
                     completionTokens += delta.getString("content").length();
+                }
+                else if(delta.containsKey("reasoning") && delta.getString("reasoning")!=null) {
+                    logger.info("reasoning: {}, completionId: {}", delta.getString("reasoning"), deltaObject.getString("id"));
                 }
             }
         }
@@ -302,51 +308,56 @@ public class OpenAiSseClient {
             JSONArray originalFunctions = new JSONArray();
             List<FunctionCall> functionCalls = new ArrayList<>();
             JSONArray wrongArgFunctionCalls = new JSONArray();
-            for(int i=0; i<toolCallsArray.size(); i++) {
-                JSONObject tmpObject = toolCallsArray.getJSONObject(i);
-                JSONObject tmpFunObj = tmpObject.getJSONObject("function");
-                if(StringUtils.isNoneBlank(tmpFunObj.getString("name"))) {
-                    originalFunctions.add(tmpFunObj.getString("name"));
-                    JSONObject arguments = null;
-                    boolean argsIsValid = true;
-                    if(tmpFunObj.containsKey("arguments") && tmpFunObj.get("arguments")!=null) {
-                        if(tmpFunObj.get("arguments") instanceof String) {
-                            String args = tmpFunObj.getString("arguments");
-                            JSONObject tmpArgumentObj = parseStringArgs(args, tmpFunObj);
-                            if(tmpArgumentObj!=null && !tmpArgumentObj.containsKey("jsonExceptionLV")) {
-                                arguments = tmpArgumentObj;
+            try {
+                for(int i=0; i<toolCallsArray.size(); i++) {
+                    JSONObject tmpObject = toolCallsArray.getJSONObject(i);
+                    JSONObject tmpFunObj = tmpObject.getJSONObject("function");
+                    if(StringUtils.isNoneBlank(tmpFunObj.getString("name"))) {
+                        originalFunctions.add(tmpFunObj.getString("name"));
+                        JSONObject arguments = null;
+                        boolean argsIsValid = true;
+                        if(tmpFunObj.containsKey("arguments") && tmpFunObj.get("arguments")!=null) {
+                            if(tmpFunObj.get("arguments") instanceof String) {
+                                String args = tmpFunObj.getString("arguments");
+                                JSONObject tmpArgumentObj = parseStringArgs(args, tmpFunObj);
+                                if(tmpArgumentObj!=null && !tmpArgumentObj.containsKey("jsonExceptionLV")) {
+                                    arguments = tmpArgumentObj;
+                                }
+                                else {
+                                    argsIsValid = false;
+                                    if(tmpArgumentObj!=null && tmpArgumentObj.containsKey("jsonExceptionLV")) {
+                                        JSONObject wrongArgFunctionCall = new JSONObject();
+                                        wrongArgFunctionCall.put("name", tmpFunObj.getString("name"));
+                                        wrongArgFunctionCall.put("arguments", args);
+                                        wrongArgFunctionCall.put("exception", tmpArgumentObj.getString("jsonExceptionLV"));
+                                        wrongArgFunctionCalls.add(wrongArgFunctionCall);
+                                    }
+                                }
+                            }
+                            else if(tmpFunObj.get("arguments") instanceof JSONObject) {
+                                arguments = tmpFunObj.getJSONObject("arguments");
                             }
                             else {
                                 argsIsValid = false;
-                                if(tmpArgumentObj!=null && tmpArgumentObj.containsKey("jsonExceptionLV")) {
-                                    JSONObject wrongArgFunctionCall = new JSONObject();
-                                    wrongArgFunctionCall.put("name", tmpFunObj.getString("name"));
-                                    wrongArgFunctionCall.put("arguments", args);
-                                    wrongArgFunctionCall.put("exception", tmpArgumentObj.getString("jsonExceptionLV"));
-                                    wrongArgFunctionCalls.add(wrongArgFunctionCall);
-                                }
+                                logger.error("invalid arguments object: {}", tmpFunObj.get("arguments"));
+                                JSONObject wrongArgFunctionCall = new JSONObject();
+                                wrongArgFunctionCall.put("name", tmpFunObj.getString("name"));
+                                wrongArgFunctionCall.put("arguments", tmpFunObj.get("arguments"));
+                                wrongArgFunctionCall.put("exception", "未知的数据类型");
+                                wrongArgFunctionCalls.add(wrongArgFunctionCall);
                             }
                         }
-                        else if(tmpFunObj.get("arguments") instanceof JSONObject) {
-                            arguments = tmpFunObj.getJSONObject("arguments");
+                        if(argsIsValid) {
+                            functionCalls.add(new FunctionCall(tmpObject, tmpObject.getString("id"), tmpFunObj.getString("name"), arguments));
                         }
                         else {
-                            argsIsValid = false;
-                            logger.error("invalid arguments object: {}", tmpFunObj.get("arguments"));
-                            JSONObject wrongArgFunctionCall = new JSONObject();
-                            wrongArgFunctionCall.put("name", tmpFunObj.getString("name"));
-                            wrongArgFunctionCall.put("arguments", tmpFunObj.get("arguments"));
-                            wrongArgFunctionCall.put("exception", "未知的数据类型");
-                            wrongArgFunctionCalls.add(wrongArgFunctionCall);
+                            logger.error("method: {} with invalid arguments: {}", tmpFunObj.getString("name"), tmpFunObj.get("arguments"));
                         }
                     }
-                    if(argsIsValid) {
-                        functionCalls.add(new FunctionCall(tmpObject, tmpObject.getString("id"), tmpFunObj.getString("name"), arguments));
-                    }
-                    else {
-                        logger.error("method: {} with invalid arguments: {}", tmpFunObj.getString("name"), tmpFunObj.get("arguments"));
-                    }
                 }
+            }
+            catch (Exception e) {
+                logger.error("getToolCalls error: ", e);
             }
             toolCalls.setOriginalFunctions(originalFunctions);
             if(!functionCalls.isEmpty()) {

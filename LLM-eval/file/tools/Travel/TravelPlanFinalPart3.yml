@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: 分析和统计相关，涵盖费用分析、行程统计，用户行为分析、满意度调查、综合报告、
 servers:
-  - url: 'http://192.168.2.201:8083/travel-plans-final'
+  - url: 'http://192.168.2.201:8089/travel-plans-final'
 paths:
   '/{planId}/analytics/expenses':
     get:

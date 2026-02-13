@@ -6,9 +6,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.litevar.ieval.llm.chat.*;
 import com.litevar.ieval.llm.memory.ChatMemory;
 import com.litevar.ieval.llm.memory.FullAmountMemory;
+import com.litevar.ieval.llm.memory.SlidingWindowMemory;
 import com.litevar.ieval.llm.tools.FunctionInfo;
 import com.litevar.ieval.llm.tools.protocol.impl.HttpProtocolParser;
 import com.litevar.ieval.llm.tools.protocol.impl.JsonRpcProtocolParser;
+import com.litevar.ieval.llm.utils.TimeUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  **/
 public class SuiteRunner {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    public void run(String testPlanPath) {
+    public void run(String testPlanPath, String model, boolean slidingWindow) {
         ExcelProcessor excelProcessor = new ExcelProcessor();
         List<TestSuiteInput> testSuites = excelProcessor.readTestPlan(testPlanPath);
         if(testSuites != null && !testSuites.isEmpty()) {
@@ -63,7 +65,7 @@ public class SuiteRunner {
                         ExecutorService executor = Executors.newFixedThreadPool(concurrency);
                         for(int i=0; i<concurrency; i++) {
                             executor.submit(() -> {
-                                batchChat(create(collector, isContinuousChat, testSuite.getRowNum(), testSuite.getSuite(), testSuite.getPrompt(), testSuite.getLlmConfig(), testSuite.getSerial(), testSuite.getTools()), testCaseInputList);
+                                batchChat(create(slidingWindow, collector, isContinuousChat, testSuite.getRowNum(), testSuite.getSuite(), testSuite.getPrompt(), testSuite.getLlmConfig(), testSuite.getSerial(), testSuite.getTools()), testCaseInputList);
                             });
                         }
                         executor.shutdown();
@@ -83,46 +85,34 @@ public class SuiteRunner {
                         testSuiteOutput.setExecuteResult(resultPath);
                     }
                     else {
-                        Agent agent = create(collector, isContinuousChat, testSuite.getRowNum(), testSuite.getSuite(), testSuite.getPrompt(), testSuite.getLlmConfig(), testSuite.getSerial(), testSuite.getTools());
+                        Agent agent = create(slidingWindow, collector, isContinuousChat, testSuite.getRowNum(), testSuite.getSuite(), testSuite.getPrompt(), testSuite.getLlmConfig(), testSuite.getSerial(), testSuite.getTools());
                         for (Map.Entry<Integer, TestCaseInput> entry : testCaseInputMap.entrySet()) {
                             agent.chat(entry.getValue());
+                            TimeUtil.waitFor(15000);
                         }
                         boolean success = excelProcessor.writeResultToTestSuite(testSuite.getSuite(), collector.getTestCaseOutputList());
-                        testSuiteOutput.setExecuteResult(success ? testSuite.getSuite() : null);
+                        testSuiteOutput.setExecuteResult(success ? testSuite.getSuite() : "");
                     }
-                    testSuiteOutput.setSummary(collector.getSuiteOutputSummary());
+                    SuiteSummary suiteSummary = collector.getSuiteOutputSummary();
+                    testSuiteOutput.setSummary(suiteSummary!=null?suiteSummary.getSummary():"");
                     excelProcessor.writeSummaryToTestPlan(testPlanPath, testSuiteOutput);
-                    suiteSummaryList.add(new SuiteSummary(testSuite.getSuite(), collector.getSuiteRatingLevel(), collector.getSuitePoint()));
+                    if(suiteSummary!=null){
+                    	suiteSummary.setDescription(testSuite.getDescription());
+	                    suiteSummaryList.add(suiteSummary);
+	                }
                 }
                 else {
                     logger.warn("No test cases found in test suite: {}", testSuite.getSerial());
                 }
+                TimeUtil.waitFor(20000);
             }
-            float totalScore = 0;
-            for (SuiteSummary suiteSummary : suiteSummaryList) {
-                totalScore += suiteSummary.getScore();
-                logger.info("Suite: {}, score: {}, level: {}", suiteSummary.getName(), suiteSummary.getScore(), suiteSummary.getLevel());
-            }
-            int suiteCount = suiteSummaryList.size();
-            float averageScore = suiteCount>1?(totalScore/suiteCount):totalScore;
-            String ratingLevel = "D";
-            if(averageScore>95) {
-                ratingLevel = "SS";
-            } else if (averageScore>90) {
-                ratingLevel = "S";
-            } else if (averageScore>80) {
-                ratingLevel = "A";
-            } else if (averageScore>70) {
-                ratingLevel = "B";
-            } else if (averageScore>60) {
-                ratingLevel = "C";
-            }
-            logger.info("Test plan done with {} suites, score: {}, level: {}", suiteCount, averageScore, ratingLevel);
+            SuiteSummaryHandler.suiteSummaryToMarkdown(suiteSummaryList, model,  false);
         }
         else {
             logger.warn("No test suites found in test plan: {}", testPlanPath);
         }
     }
+
     public JSONObject dealTools(String serial, String tools) {
         if (StringUtils.isNoneBlank(tools) && StringUtils.startsWith(tools, "[") && StringUtils.endsWith(tools, "]")) {
             JSONArray toolArray = JSONArray.parseArray(tools);
@@ -218,13 +208,13 @@ public class SuiteRunner {
         }
         return result;
     }
-    private Agent create(OutputCollector collector, boolean isContinuousChat, int id, String name, String prompt, String llmConfig, String serial, String tools) {
+    private Agent create(boolean slidingWindow, OutputCollector collector, boolean isContinuousChat, int id, String name, String prompt, String llmConfig, String serial, String tools) {
         String sessionId = UUID.randomUUID().toString();
         logger.info("sessionId: {}", sessionId);
         JSONObject modelKeyObject = JSONObject.parseObject(llmConfig);
         ChatConfig chatConfig = JSON.toJavaObject(modelKeyObject.getJSONObject("chatConfig"), ChatConfig.class);
         ChatOptions chatOptions = JSON.toJavaObject(modelKeyObject.getJSONObject("chatOptions"), ChatOptions.class);
-        ChatMemory memory = new FullAmountMemory();
+        ChatMemory memory = slidingWindow? new SlidingWindowMemory(30) : new FullAmountMemory();
         Agent agent = new Agent(id, name, prompt, chatConfig, chatOptions, memory, true, sessionId);
         agent.setOutputBus(collector.getOutputBus());
         agent.setIsContinuousChat(isContinuousChat);

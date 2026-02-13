@@ -4,7 +4,7 @@ info:
   description: 旅游计划活动管理相关接口
   version: 1.0.0
 servers:
-  - url: http://192.168.2.201:8083/travel-plans/activities
+  - url: http://192.168.2.201:8089/travel-plans/activities
 paths:
   /{planId}/reminders:
     get:

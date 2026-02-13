@@ -28,25 +28,25 @@ public class HttpFunctionInvoker extends AbstractFunctionInvoker {
     @Override
     public Object invoke(JSONObject realArgs) {
         logger.debug("methodName: {}", methodName);
-        if(StringUtils.isBlank(info.getMethod()) || "get".equals(info.getMethod().toLowerCase())) {
+        if(StringUtils.isBlank(info.getMethod()) || "get".equalsIgnoreCase(info.getMethod())) {
             logger.info("http GET");
             //return RestUtil.sendGet(info.getServer()+transParams(realArgs, info.getRemarks()), info.getHeaders());
             String exUrl = dealQueryAndPath(info.getServer(), realArgs, info.getQueries(), info.getPaths());
             return RestUtil.sendGet(exUrl, info.getHeaders());
         }
-        else if("post".equals(info.getMethod().toLowerCase())) {
+        else if("post".equalsIgnoreCase(info.getMethod())) {
             logger.info("http post");
             String exUrl = dealQueryAndPath(info.getServer(), realArgs, info.getQueries(), info.getPaths());
             //return RestUtil.sendPost(info.getServer(), info.getHeaders(), realArgs!=null?realArgs.toJSONString():"");
             return RestUtil.sendPost(exUrl, info.getHeaders(), realBodyObject!=null?realBodyObject.toJSONString():"");
         }
-        else if("put".equals(info.getMethod().toLowerCase())) {
+        else if("put".equalsIgnoreCase(info.getMethod())) {
             logger.info("http put");
             String exUrl = dealQueryAndPath(info.getServer(), realArgs, info.getQueries(), info.getPaths());
             //return RestUtil.sendPut(info.getServer(), info.getHeaders(), realArgs!=null?realArgs.toJSONString():"");
             return RestUtil.sendPut(exUrl, info.getHeaders(), realBodyObject!=null?realBodyObject.toJSONString():"");
         }
-        else if("delete".equals(info.getMethod().toLowerCase())) {
+        else if("delete".equalsIgnoreCase(info.getMethod())) {
             logger.info("http delete");
             //return RestUtil.sendDelete(info.getServer()+transParams(realArgs, info.getRemarks()), info.getHeaders());
             String exUrl = dealQueryAndPath(info.getServer(), realArgs, info.getQueries(), info.getPaths());
@@ -57,7 +57,7 @@ public class HttpFunctionInvoker extends AbstractFunctionInvoker {
 
     //POST,PUT /v1/{pet}?name=xx has body
     private String dealQueryAndPath(String url, JSONObject args, String queries, String paths) {
-        if(args!=null && args.size()>0) {
+        if(args!=null && !args.isEmpty()) {
             String targetUrl = url;
             realBodyObject = new JSONObject();
             StringBuffer queryBuffer = new StringBuffer();
@@ -81,7 +81,7 @@ public class HttpFunctionInvoker extends AbstractFunctionInvoker {
                     realBodyObject.put(entry.getKey(), entry.getValue());
                 }
             }
-            if(queryBuffer.length()>0) {
+            if(!queryBuffer.isEmpty()) {
                 String params = queryBuffer.toString();
                 params = params.endsWith("&")?StringUtils.substring(params, 0, params.length()-1):params;
                 logger.info("params: {}", params);
